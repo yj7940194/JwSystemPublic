@@ -1,11 +1,15 @@
 <template>
   <div class="app-container">
     <el-card shadow="never" class="mb-2">
-      <div slot="header">
-        <span>评价查询</span>
+      <div slot="header" class="clearfix">
+        <span>学生评价列表</span>
       </div>
-      
-      <el-form inline size="small" label-width="80px" class="filters" style="margin-bottom: 16px">
+
+      <el-form inline size="small" label-width="80px" class="filters">
+        <el-form-item label="课程">
+          <el-input v-model="courseName" disabled placeholder="(从列表进入)" style="width: 320px" />
+        </el-form-item>
+
         <el-form-item label="评价批次">
           <el-select
             v-model="selectedBatchId"
@@ -19,66 +23,78 @@
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" size="small" :disabled="!selectedBatchId" :loading="loading" @click="fetchCourses">
+          <el-button type="primary" size="small" :disabled="!selectedBatchId || !courseTcid" :loading="loading" @click="fetchStudents">
             刷新
           </el-button>
         </el-form-item>
       </el-form>
+    </el-card>
 
-      <el-table
-        :data="dataList"
-        v-loading="loading"
-        border
-        style="width: 100%">
+    <el-card shadow="never">
+      <el-table v-loading="loading" :data="dataList" size="small" border style="width: 100%">
         <el-table-column label="序号" type="index" width="60" align="center" />
-        <el-table-column prop="courseName" label="课程" min-width="220" show-overflow-tooltip />
-        <el-table-column prop="commentType" label="评价类型" width="140" align="center" />
-        <el-table-column label="操作" width="160" align="center">
+        <el-table-column prop="sid" label="学号" width="120" />
+        <el-table-column prop="sname" label="姓名" min-width="160" />
+        <el-table-column label="状态" width="110" align="center">
           <template slot-scope="scope">
-            <el-button type="primary" size="mini" @click="openStudentList(scope.row)">查看学生评价</el-button>
+            <el-tag v-if="Number(scope.row.status) === 1" type="success">已评价</el-tag>
+            <el-tag v-else type="warning">未评价</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="remark" label="得分" width="120" align="center">
+          <template slot-scope="scope">
+            <span v-if="Number(scope.row.status) === 1">{{ scope.row.remark || 0 }}/100</span>
+            <span v-else>-</span>
           </template>
         </el-table-column>
       </el-table>
-      
+
       <div class="pagination-container">
         <el-pagination
           background
-          @current-change="onPageChange"
           :current-page="page"
           :page-size="size"
           layout="total, prev, pager, next"
-          :total="total">
-        </el-pagination>
+          :total="total"
+          @current-change="onPageChange"
+        />
       </div>
-
     </el-card>
   </div>
 </template>
 
 <script>
 import request from '@/utils/request'
+
 export default {
-  name: "TeacherComment",
+  name: 'TeacherStudentCommentList',
   data() {
     return {
       batchesLoading: false,
       batches: [],
       selectedBatchId: null,
 
-      dataList: [],
+      courseTcid: '',
+      courseName: '',
+
       loading: false,
+      dataList: [],
       total: 0,
       page: 1,
       size: 10
-    };
+    }
   },
   watch: {
     selectedBatchId() {
       this.page = 1
-      this.fetchCourses()
+      this.fetchStudents()
     }
   },
   created() {
+    const q = this.$route && this.$route.query ? this.$route.query : {}
+    this.courseTcid = q.cid || ''
+    this.courseName = q.courseName || ''
+    this.selectedBatchId = q.commentId || null
     this.fetchBatches()
   },
   methods: {
@@ -97,39 +113,35 @@ export default {
         if (!this.selectedBatchId && this.batches.length) this.selectedBatchId = this.batches[0].id
       } catch (e) {
         this.batches = []
-        this.selectedBatchId = null
         if (this.$message) this.$message.error('获取评价批次失败')
       } finally {
         this.batchesLoading = false
       }
     },
-    fetchCourses() {
-      if (!this.selectedBatchId) return
-      this.loading = true;
-      request.get('/api/teamComment/findTeacher', { params: { commentId: this.selectedBatchId, offset: this.page, limit: this.size } })
-        .then(res => {
-          this.dataList = (res && res.rows) || [];
-          this.total = (res && typeof res.total === 'number' ? res.total : Number(res && res.total)) || 0;
+    fetchStudents() {
+      if (!this.selectedBatchId || !this.courseTcid) return
+      this.loading = true
+      request
+        .get('/api/teamComment/findStudentComment', { params: { commentId: this.selectedBatchId, cid: this.courseTcid, offset: this.page, limit: this.size } })
+        .then((res) => {
+          this.dataList = (res && res.rows) || []
+          this.total = (res && typeof res.total === 'number' ? res.total : Number(res && res.total)) || 0
         })
         .catch(() => {
           this.dataList = []
           this.total = 0
-          if (this.$message) this.$message.error('获取评价课程列表失败')
+          if (this.$message) this.$message.error('获取学生评价列表失败')
         })
         .finally(() => {
-          this.loading = false;
-        });
+          this.loading = false
+        })
     },
     onPageChange(p) {
       this.page = p
-      this.fetchCourses()
-    },
-    openStudentList(row) {
-      const cid = row && row.tcid ? row.tcid : (row && row.cid ? row.cid : '')
-      this.$router.push({ path: '/teacher/studentList', query: { cid, commentId: this.selectedBatchId, courseName: row.courseName || '' } })
+      this.fetchStudents()
     }
   }
-};
+}
 </script>
 
 <style scoped>
@@ -141,3 +153,4 @@ export default {
   text-align: right;
 }
 </style>
+

@@ -28,7 +28,7 @@ public interface TClassesMapper extends BaseMapper<TClasses> {
     @Select("select cs.*,s.name sname,c.name cname,g.name gname from `t_classes` cs,`t_specialty` s,`t_college` c,`t_grade` g where cs.`college_id` = c.`id` and cs.`specialty_id` = s.`id` and g.`id` = cs.`grade_id`")
     IPage<QueryClassesVO> findAll(Page page);
 
-    @Select("select cs.*,s.name sname,c.name cname,g.name gname from `t_classes` cs,`t_specialty` s,`t_college` c,`t_grade` g ${ew.customSqlSegment} and cs.`college_id` = c.`id` and cs.`specialty_id` = s.`id` and g.`id` = cs.`grade_id`")
+    @Select("select cs.*,s.`name` sname,c.`name` cname,g.`name` gname from `t_classes` cs LEFT JOIN `t_specialty` s ON cs.`specialty_id` = s.`id` LEFT JOIN `t_college` c ON cs.`college_id` = c.`id` LEFT JOIN `t_grade` g ON g.`id` = cs.`grade_id` ${ew.customSqlSegment}")
     IPage<QueryClassesVO> findByParams(Page page, @Param(Constants.WRAPPER) Wrapper wrapper);
 
     @Select("select c.* from t_classes c,t_grade g where c.`grade_id` = g.`id` and c.`college_id` = #{collegeId} and g.`id` = #{gradeId}")

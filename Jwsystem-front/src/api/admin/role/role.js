@@ -1,9 +1,10 @@
 import request from '@/utils/request'
 
-export function findMenuByRole() {
+export function findMenuByRole(roleId) {
   return request({
     url: 'api/role/findMenuByRole',
-    method: 'get'
+    method: 'get',
+    params: { roleId }
   })
 }
 
@@ -16,13 +17,14 @@ export function add(data) {
 }
 
 export function del(id) {
-  return request({
-    url: 'api/role/delete',
-    method: 'delete',
-    params: {
-      roleId: id
-    }
-  })
+  const ids = Array.isArray(id) ? id : [id]
+  return Promise.all(
+    ids.map(roleId => request({
+      url: 'api/role/delete',
+      method: 'delete',
+      params: { roleId }
+    }))
+  )
 }
 
 export function edit(data) {
@@ -41,4 +43,4 @@ export function saveMenu(data) {
   })
 }
 
-export default { add, edit, del, saveMenu }
+export default { add, edit, del, saveMenu, findMenuByRole }

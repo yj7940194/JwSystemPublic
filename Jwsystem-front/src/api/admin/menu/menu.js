@@ -16,13 +16,14 @@ export function add(data) {
 }
 
 export function del(id) {
-  return request({
-    url: 'api/menu/delete',
-    method: 'delete',
-    params: {
-      menuId: id
-    }
-  })
+  const ids = Array.isArray(id) ? id : [id]
+  return Promise.all(
+    ids.map(menuId => request({
+      url: 'api/menu/delete',
+      method: 'delete',
+      params: { menuId }
+    }))
+  )
 }
 
 export function edit(data) {

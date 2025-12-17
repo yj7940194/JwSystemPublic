@@ -118,7 +118,9 @@ public class CourseService extends BaseService {
     }
 
     public IPage endApply(QueryCourseVO courseVO, UserRealm realm) {
-        IPage<CourseDTO> iPage = courseMapper.courseApply(this.getPage(courseVO), realm.getCollegeId());
+        IPage<CourseDTO> iPage = (realm == null || StringUtils.isEmpty(realm.getCollegeId()))
+                ? courseMapper.courseApplyAll(this.getPage(courseVO))
+                : courseMapper.courseApply(this.getPage(courseVO), realm.getCollegeId());
         return iPage;
     }
 

@@ -72,7 +72,7 @@ export default {
       // 复用学生课表的数据处理逻辑，后端返回结构一致
       request.get('/api/teacher/findSchedule')
         .then(res => {
-          this.processData(res.data);
+          this.processData(res);
         })
         .catch(err => {
           console.error(err);

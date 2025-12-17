@@ -16,20 +16,25 @@ export function add(data) {
 }
 
 export function del(id) {
-  return request({
-    url: 'api/user/delete',
-    method: 'delete',
-    params: {
-      id: id
-    }
-  })
+  const ids = Array.isArray(id) ? id : [id]
+  return Promise.all(
+    ids.map(userId => request({
+      url: 'api/user/delete',
+      method: 'delete',
+      params: { id: userId }
+    }))
+  )
 }
 
 export function edit(data) {
+  const payload = { ...data }
+  if (!payload.password) {
+    delete payload.password
+  }
   return request({
     url: 'api/user/edit',
     method: 'put',
-    data
+    data: payload
   })
 }
 

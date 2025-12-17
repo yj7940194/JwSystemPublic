@@ -29,6 +29,19 @@ public class SpecialtyService extends BaseService {
     @Autowired
     private TSpecialtyMapper specialtyMapper;
 
+    private static String qualifySort(String sort, String tableAlias) {
+        if (StringUtils.isEmpty(sort)) {
+            return sort;
+        }
+        String[] split = sort.split(",", 2);
+        String column = split[0];
+        if (column.contains(".") || column.contains("`")) {
+            return sort;
+        }
+        String qualified = tableAlias + ".`" + column + "`";
+        return split.length > 1 ? qualified + "," + split[1] : qualified;
+    }
+
     public RS add(TSpecialty model) {
         return specialtyMapper.insert(model) == 0 ? RS.error("插入失败") : RS.ok("插入成功");
     }
@@ -64,6 +77,7 @@ public class SpecialtyService extends BaseService {
     }
 
     public IPage pageQuery(QuerySpecialtyVO baseQueryParam, UserRealm realm) {
+        baseQueryParam.setSort(qualifySort(baseQueryParam.getSort(), "s"));
         Page<QuerySpecialtyVO> page = getPage(baseQueryParam);
         IPage<QuerySpecialtyVO> iPage = null;
         Map<String, Object> map = new HashMap<>();

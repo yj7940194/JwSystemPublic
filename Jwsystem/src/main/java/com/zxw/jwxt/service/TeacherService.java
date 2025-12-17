@@ -6,12 +6,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zxw.common.pojo.RS;
 import com.zxw.jwxt.domain.TTeacher;
 import com.zxw.jwxt.domain.TeacherRole;
+import com.zxw.jwxt.domain.TTeam;
 import com.zxw.jwxt.domain.UserRealm;
 import com.zxw.jwxt.dto.CourseDTO;
 import com.zxw.jwxt.dto.ScheduleDTO;
 import com.zxw.jwxt.mapper.TTeacherMapper;
 import com.zxw.jwxt.vo.QueryCourseVO;
 import com.zxw.jwxt.vo.QueryTeacherVO;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +33,9 @@ import java.util.List;
 public class TeacherService extends BaseService {
     @Autowired
     private CourseService courseService;
+
+    @Autowired
+    private TeamService teamService;
 
     @Autowired
     private TTeacherMapper teacherMapper;
@@ -72,7 +77,12 @@ public class TeacherService extends BaseService {
 
     public Object[][] findSchedule(QueryCourseVO queryCourseVO, String userId) {
         Object[][] arr = new Object[5][7];
-        List<CourseDTO> list = courseService.findScheduleByTeacher(userId, queryCourseVO.getTeamId());
+        String teamId = queryCourseVO != null ? queryCourseVO.getTeamId() : null;
+        if (StringUtils.isEmpty(teamId)) {
+            TTeam team = teamService.findOne();
+            teamId = team != null ? team.getId() : null;
+        }
+        List<CourseDTO> list = courseService.findScheduleByTeacher(userId, teamId);
         list.forEach(e -> {
             ScheduleDTO scheduleDTO = new ScheduleDTO(e.getName(), e.getWname(), e.getNname(), e.getClassroom(), null);
             switch (e.getSse()) {

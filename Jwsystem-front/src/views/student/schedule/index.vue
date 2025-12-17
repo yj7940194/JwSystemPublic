@@ -73,7 +73,7 @@ export default {
       // 调用后端API获取5x7的二维数组
       request.get('/api/student/findSchedule')
         .then(res => {
-          this.processData(res.data);
+          this.processData(res);
         })
         .catch(err => {
           console.error(err);

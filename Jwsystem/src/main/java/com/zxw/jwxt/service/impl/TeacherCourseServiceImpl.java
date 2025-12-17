@@ -36,7 +36,9 @@ public class TeacherCourseServiceImpl extends ServiceImpl<TeacherCourseMapper, T
     @Override
     public IPage findApply(QueryCourseVO queryCourseVO, UserRealm realm) {
         Page page = new Page(queryCourseVO.getOffset(), queryCourseVO.getLimit());
-        IPage ipage = teacherCourseMapper.findApply(page, realm.getCollegeId());
+        IPage ipage = (realm == null || realm.getCollegeId() == null || realm.getCollegeId().trim().isEmpty())
+                ? teacherCourseMapper.findApplyAll(page)
+                : teacherCourseMapper.findApply(page, realm.getCollegeId());
         return ipage;
     }
 

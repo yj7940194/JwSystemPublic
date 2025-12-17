@@ -1,0 +1,137 @@
+:root {
+  --app-bg: #f5f7fb;
+  --surface: #ffffff;
+  --surface-muted: #f7f9fc;
+  --text-primary: #1f2328;
+  --text-secondary: #57606a;
+  --border: rgba(27, 31, 36, 0.12);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.10);
+  --radius-sm: 10px;
+  --radius-md: 14px;
+}
+
+body {
+  background: var(--app-bg);
+  color: var(--text-primary);
+}
+
+#app {
+  background: var(--app-bg);
+}
+
+// Main content surface
+.app-main {
+  background: var(--app-bg);
+}
+
+// Cards
+.el-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.el-card__header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, #fff 0%, #fbfcff 100%);
+}
+
+.el-card__body {
+  padding: 18px;
+}
+
+// Tables
+.el-table {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.el-table th.el-table__cell {
+  background: var(--surface-muted);
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.el-table--border,
+.el-table--group {
+  border-color: var(--border);
+}
+
+.el-table--border::after,
+.el-table--group::after,
+.el-table::before {
+  background-color: var(--border);
+}
+
+.el-table td.el-table__cell,
+.el-table th.el-table__cell.is-leaf {
+  border-bottom-color: var(--border);
+}
+
+.el-table--border th.el-table__cell,
+.el-table--border td.el-table__cell {
+  border-right-color: var(--border);
+}
+
+// Dialogs
+.el-dialog {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.el-dialog__header {
+  padding: 16px 18px 10px;
+}
+
+.el-dialog__body {
+  padding: 18px;
+}
+
+// Inputs & buttons
+.el-input__inner,
+.el-textarea__inner {
+  border-radius: var(--radius-sm);
+}
+
+.el-button {
+  border-radius: var(--radius-sm);
+}
+
+.el-button--primary {
+  box-shadow: 0 8px 22px rgba(24, 144, 255, 0.18);
+}
+
+// Spacing helpers (consistent list pages)
+.app-container {
+  padding: 18px 18px 28px 18px;
+}
+
+.pagination-container {
+  margin-top: 16px;
+}
+
+label {
+  font-weight: 600;
+}
+
+// CRUD toolbars / filter bars
+.head-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 12px 2px;
+  margin-bottom: 12px;
+}
+
+// Alerts & empty states
+.el-alert {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.el-table__empty-text,
+.el-empty__description {
+  color: var(--text-secondary);
+}

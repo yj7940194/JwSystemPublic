@@ -195,9 +195,10 @@ export default {
 .tags-view-container {
   height: 34px;
   width: 100%;
-  background: #fff;
-  border-bottom: 1px solid #d8dce5;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .12), 0 0 3px 0 rgba(0, 0, 0, .04);
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(10px);
   .tags-view-wrapper {
     .tags-view-item {
       display: inline-block;
@@ -205,23 +206,28 @@ export default {
       cursor: pointer;
       height: 26px;
       line-height: 26px;
-      border: 1px solid #d8dce5;
-      color: #495060;
-      background: #fff;
+      border: 1px solid var(--border);
+      color: rgba(15, 23, 42, 0.72);
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 10px;
       padding: 0 8px;
       font-size: 12px;
       margin-left: 5px;
       margin-top: 4px;
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
       &:first-of-type {
         margin-left: 15px;
       }
       &:last-of-type {
         margin-right: 15px;
       }
+      &:hover {
+        background: rgba(15, 23, 42, 0.04);
+      }
       &.active {
-        background-color: #42b983;
+        background-color: #1890ff;
         color: #fff;
-        border-color: #42b983;
+        border-color: rgba(24, 144, 255, 0.65);
         &::before {
           content: '';
           background: #fff;
@@ -242,17 +248,18 @@ export default {
     position: absolute;
     list-style-type: none;
     padding: 5px 0;
-    border-radius: 4px;
+    border-radius: 10px;
     font-size: 12px;
     font-weight: 400;
     color: #333;
-    box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, .3);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border);
     li {
       margin: 0;
       padding: 7px 16px;
       cursor: pointer;
       &:hover {
-        background: #eee;
+        background: rgba(15, 23, 42, 0.06);
       }
     }
   }
@@ -277,7 +284,7 @@ export default {
         vertical-align: -3px;
       }
       &:hover {
-        background-color: #b4bccc;
+        background-color: rgba(15, 23, 42, 0.35);
         color: #fff;
       }
     }

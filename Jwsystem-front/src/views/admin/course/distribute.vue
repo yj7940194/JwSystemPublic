@@ -24,7 +24,8 @@
 </template>
 
 <script>
-import { findStudentByCourseId, listajax as getCourses } from '@/api/admin/course'
+import { findStudentByCourseId } from '@/api/admin/course'
+import request from '@/utils/request'
 import CRUD, { presenter, header, form, crud } from '@crud/crud'
 import rrOperation from '@crud/RR.operation'
 import crudOperation from '@crud/CRUD.operation'
@@ -47,7 +48,17 @@ export default {
   },
   methods: {
       getCourses() {
-          getCourses().then(res => { this.courses = res })
+          // 分配需要选择“开课记录”(teacher_course.id)，而不是基础课程(t_course.id)
+          // 复用后端 /api/course/pageQuery，返回的 rows 中 id 为 teacher_course.id，name 为课程名
+          request.get('api/course/pageQuery', { params: { offset: 1, limit: 9999 } }).then(res => {
+            const rows = (res && res.rows) || []
+            this.courses = rows.map(r => ({ id: r.id, name: r.name }))
+            if (!this.query.id && this.courses.length) {
+              this.query.id = this.courses[0].id
+              // 自动加载首个课程的学生列表，避免页面一进来就是“暂无数据”
+              this.$nextTick(() => this.crud.toQuery())
+            }
+          }).catch(() => { this.courses = [] })
       },
       [CRUD.HOOK.beforeRefresh](crud) {
           if (!crud.query.id) {

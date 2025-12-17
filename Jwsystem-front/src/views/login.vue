@@ -5,6 +5,7 @@
       <h3 class="title">
         教务管理系统
       </h3>
+      <div class="subtitle">统一入口 · 课程 · 成绩 · 评价</div>
       <el-form-item prop="username">
         <el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="账号">
           <svg-icon slot="prefix" icon-class="user" class="el-input__icon input-icon"/>
@@ -123,36 +124,66 @@
 
 <style rel="stylesheet/scss" lang="scss">
   .login {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100%;
     background-image: url('../assets/images/login_bg.png');
     background-size: cover;
+    background-position: center;
+    padding: 24px;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(1200px 600px at 20% 20%, rgba(24, 144, 255, 0.55), transparent 55%),
+        radial-gradient(900px 520px at 80% 30%, rgba(16, 185, 129, 0.45), transparent 60%),
+        linear-gradient(135deg, rgba(15, 23, 42, 0.25), rgba(15, 23, 42, 0.35));
+      pointer-events: none;
+    }
   }
 
   .title {
     margin: 0 auto 30px auto;
     text-align: center;
-    color: #707070;
+    color: #0f172a;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: rgba(15, 23, 42, 0.65);
+    margin: -18px auto 22px auto;
+    font-size: 13px;
+    letter-spacing: 0.6px;
   }
 
   .login-form {
-    border-radius: 6px;
-    background: #ffffff;
-    width: 385px;
-    padding: 25px 25px 5px 25px;
+    position: relative;
+    z-index: 1;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.88);
+    width: 420px;
+    padding: 30px 30px 14px 30px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(10px);
 
     .el-input {
-      height: 38px;
+      height: 42px;
 
       input {
-        height: 38px;
+        height: 42px;
       }
     }
 
     .input-icon {
-      height: 39px;
+      height: 43px;
       width: 14px;
       margin-left: 2px;
     }
@@ -167,12 +198,23 @@
   .login-code {
     width: 33%;
     display: inline-block;
-    height: 38px;
+    height: 42px;
     float: right;
 
     img {
       cursor: pointer;
-      vertical-align: middle
+      vertical-align: middle;
+      height: 42px;
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.9);
     }
+  }
+
+  #el-login-footer {
+    z-index: 2;
+    color: rgba(255, 255, 255, 0.88);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
   }
 </style>

@@ -35,7 +35,7 @@ public interface TSpecialtyMapper extends BaseMapper<TSpecialty> {
             "            s.`college_id` = c.`id` ORDER BY c.`name`")
     IPage<QuerySpecialtyVO> findAll(Page page);
 
-    @Select("select s.*,c.`name` cname,c.`status` cstatus from `t_specialty` s,`t_college` c ${ew.customSqlSegment} and s.`college_id` = c.`id`")
+    @Select("select s.*,c.`name` cname,c.`status` cstatus from `t_specialty` s LEFT JOIN `t_college` c ON s.`college_id` = c.`id` ${ew.customSqlSegment}")
     IPage<QuerySpecialtyVO> findByJwUser(Page page, @Param(Constants.WRAPPER) Wrapper wrapper);
 
     @Update(" update t_specialty\n" +

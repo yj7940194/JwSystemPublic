@@ -53,32 +53,28 @@ export default {
       this.loading = true;
       request.get('/api/score/findStudentScore')
         .then(res => {
-          console.log('成绩API完整返回:', res);
-          console.log('成绩API data:', res.data);
-          
+          const payload = res && res.data ? res.data : res;
+
           // 处理不同的返回结构
           let scoreData = [];
-          if (res.data) {
-            // MyBatis-Plus IPage格式: {records: [], total: 0}
-            if (res.data.records && Array.isArray(res.data.records)) {
-              scoreData = res.data.records;
-            }
-            // 普通分页格式: {rows: [], total: 0}
-            else if (res.data.rows && Array.isArray(res.data.rows)) {
-              scoreData = res.data.rows;
-            }
-            // 直接数组
-            else if (Array.isArray(res.data)) {
-              scoreData = res.data;
-            }
-            // 单个对象
-            else if (typeof res.data === 'object') {
-              scoreData = [res.data];
-            }
+          // MyBatis-Plus IPage格式: {records: [], total: 0}
+          if (payload && payload.records && Array.isArray(payload.records)) {
+            scoreData = payload.records;
           }
-          
+          // 普通分页格式: {rows: [], total: 0}
+          else if (payload && payload.rows && Array.isArray(payload.rows)) {
+            scoreData = payload.rows;
+          }
+          // 直接数组
+          else if (Array.isArray(payload)) {
+            scoreData = payload;
+          }
+          // 单个对象
+          else if (payload && typeof payload === 'object') {
+            scoreData = [payload];
+          }
+
           this.dataList = scoreData;
-          console.log('解析后的成绩数据:', this.dataList);
           
           if (this.dataList.length === 0) {
             this.$message.warning('暂无成绩数据');
@@ -86,10 +82,9 @@ export default {
         })
         .catch(err => {
           console.error('获取成绩失败:', err);
-          console.error('错误详情:', err.response);
-          const errMsg = err.response && err.response.data && err.response.data.message 
-            ? err.response.data.message 
-            : err.message;
+          const errMsg = err && err.response && err.response.data && err.response.data.message
+            ? err.response.data.message
+            : (err && err.message ? err.message : String(err));
           this.$message.error('获取成绩失败: ' + errMsg);
         })
         .finally(() => {

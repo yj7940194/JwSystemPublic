@@ -10,8 +10,8 @@
     </div>
     <!--表格渲染-->
     <el-table ref="table" v-loading="crud.loading" :data="crud.data" size="small" style="width: 100%;">
-      <el-table-column prop="cname" label="课程名称" />
-      <el-table-column prop="tname" label="申请教师" />
+      <el-table-column prop="name" label="课程名称" />
+      <el-table-column prop="teacherName" label="申请教师" />
       <el-table-column prop="end" label="状态" align="center">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.end === 1">申请结课</el-tag>
@@ -59,7 +59,7 @@ export default {
       this.$confirm(`确认${status === 'agree' ? '同意' : '驳回'}该结课申请?`, '提示', {
         type: 'warning'
       }).then(() => {
-        updateCourseEnd({ id: row.id, endStatus: status, tid: row.teacherId }).then(() => {
+        updateCourseEnd({ id: row.id, endStatus: status, tid: row.tid }).then(() => {
           this.$message.success('操作成功')
           this.crud.refresh()
         })

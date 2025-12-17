@@ -130,8 +130,10 @@ export default {
   height: 50px;
   overflow: hidden;
   position: relative;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(10px);
 
   .hamburger-container {
     line-height: 46px;
@@ -142,7 +144,7 @@ export default {
     -webkit-tap-highlight-color: transparent;
 
     &:hover {
-      background: rgba(0, 0, 0, 0.025);
+      background: rgba(15, 23, 42, 0.04);
     }
   }
 
@@ -169,7 +171,7 @@ export default {
       padding: 0 8px;
       height: 100%;
       font-size: 18px;
-      color: #5a5e66;
+      color: rgba(15, 23, 42, 0.72);
       vertical-align: text-bottom;
 
       &.hover-effect {
@@ -177,7 +179,7 @@ export default {
         transition: background 0.3s;
 
         &:hover {
-          background: rgba(0, 0, 0, 0.025);
+          background: rgba(15, 23, 42, 0.04);
         }
       }
     }
@@ -193,7 +195,9 @@ export default {
           cursor: pointer;
           width: 40px;
           height: 40px;
-          border-radius: 10px;
+          border-radius: 12px;
+          border: 1px solid rgba(27, 31, 36, 0.10);
+          box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
         }
 
         .el-icon-caret-bottom {

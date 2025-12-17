@@ -54,15 +54,17 @@ export default {
       this.loading = true;
       request.get('/api/plan/listajax', { params: this.query })
         .then(res => {
-           // 处理可能的返回结构 mismatch
-           const data = res.data;
-           if (Array.isArray(data)) {
-             this.dataList = data;
-           } else if (data.rows) {
-             this.dataList = data.rows;
-           } else {
-             this.dataList = [];
-           }
+          // request 拦截器已返回 response.data，这里直接兼容多种结构
+          const payload = res && res.data ? res.data : res;
+          if (payload && Array.isArray(payload.records)) {
+            this.dataList = payload.records;
+          } else if (payload && Array.isArray(payload.rows)) {
+            this.dataList = payload.rows;
+          } else if (Array.isArray(payload)) {
+            this.dataList = payload;
+          } else {
+            this.dataList = [];
+          }
         })
         .catch(err => {
           console.error(err);

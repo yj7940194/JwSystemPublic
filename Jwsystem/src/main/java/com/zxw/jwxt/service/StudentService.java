@@ -9,12 +9,14 @@ import com.zxw.common.pojo.RS;
 import com.zxw.common.utils.FileUtils;
 import com.zxw.jwxt.domain.StudentRole;
 import com.zxw.jwxt.domain.TStudent;
+import com.zxw.jwxt.domain.TTeam;
 import com.zxw.jwxt.domain.TUser;
 import com.zxw.jwxt.domain.UserRealm;
 import com.zxw.jwxt.dto.CourseDTO;
 import com.zxw.jwxt.dto.ScheduleDTO;
 import com.zxw.jwxt.mapper.TStudentMapper;
 import com.zxw.jwxt.vo.QueryStudentVO;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.*;
@@ -50,6 +52,9 @@ public class StudentService extends BaseService {
 
     @Autowired
     private CourseService courseService;
+
+    @Autowired
+    private TeamService teamService;
 
     @Autowired
     private StudentRoleService studentRoleService;
@@ -238,7 +243,12 @@ public class StudentService extends BaseService {
 
     public Object[][] findSchedule(QueryStudentVO queryCourseVO, String userId) {
         Object[][] arr = new Object[5][7];
-        List<CourseDTO> list = courseService.findScheduleByStudent(userId, queryCourseVO.getTeamId());
+        String teamId = queryCourseVO != null ? queryCourseVO.getTeamId() : null;
+        if (StringUtils.isEmpty(teamId)) {
+            TTeam team = teamService.findOne();
+            teamId = team != null ? team.getId() : null;
+        }
+        List<CourseDTO> list = courseService.findScheduleByStudent(userId, teamId);
         list.forEach(e -> {
             ScheduleDTO scheduleDTO = new ScheduleDTO(e.getCourseName(), e.getWname(), e.getTeacherName(), e.getClassroom(), null);
             switch (e.getSse()) {

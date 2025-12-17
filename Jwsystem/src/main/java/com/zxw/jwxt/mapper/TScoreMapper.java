@@ -61,7 +61,7 @@ public interface TScoreMapper extends BaseMapper<TScore> {
      *
      * @return
      */
-    @Select("SELECT tc.`id`,s.`point`,c.`credit`,c.`isExam`,c.`name`,te.`name` tname,s.`score`,cs.`name` csname,c.`total_time`,system.`name` systemName FROM `t_score` s,`t_course` c,`t_teacher` t,`t_team` te,`t_student` ts,`t_week` w,`t_section` se,`t_cstatus` cs,`teacher_course` tc,`course_system` system  WHERE system.`id` = c.`system_id` AND s.`student_id` = ts.`sid` AND tc.`cid` = c.`id` AND  s.`course_id` = tc.`id` AND tc.`team_id` = te.`id` AND tc.`week_id` = w.`id` AND s.`teacher_id` = t.`tid` AND se.`id`= tc.`section_id` AND cs.`id` = c.`cstatus_id` AND ts.`sid` = #{sid} AND s.status='1'")
+    @Select("SELECT tc.`id`,s.`point`,c.`credit`,c.`isExam`,c.`name`,te.`name` tname,s.`score`,cs.`name` csname,c.`total_time`,csys.`name` systemName FROM `t_score` s,`t_course` c,`t_teacher` t,`t_team` te,`t_student` ts,`t_week` w,`t_section` se,`t_cstatus` cs,`teacher_course` tc,`course_system` csys  WHERE csys.`id` = c.`system_id` AND s.`student_id` = ts.`sid` AND tc.`cid` = c.`id` AND  s.`course_id` = tc.`id` AND tc.`team_id` = te.`id` AND tc.`week_id` = w.`id` AND s.`teacher_id` = t.`tid` AND se.`id`= tc.`section_id` AND cs.`id` = c.`cstatus_id` AND ts.`sid` = #{sid} AND s.status='1'")
     IPage<ScoreDTO> findStudentScore(Page page, @Param("sid") String sid);
 
     /**

@@ -127,8 +127,13 @@ function CRUD(options) {
         crud.loading = true
         // 请求数据
         initData(crud.url, crud.getQueryParams()).then(data => {
-          crud.page.total = data.total || data.totalElements
-          crud.data = data.rows || data.content
+          if (Array.isArray(data)) {
+            crud.page.total = data.length
+            crud.data = data
+          } else {
+            crud.page.total = (data && (data.total || data.totalElements)) || 0
+            crud.data = (data && (data.rows || data.content)) || []
+          }
           crud.resetDataStatus()
           // time 毫秒后显示表格
           setTimeout(() => {

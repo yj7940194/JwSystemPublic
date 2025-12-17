@@ -30,11 +30,25 @@ public class ClassesService extends BaseService {
     @Autowired
     private TClassesMapper classesMapper;
 
+    private static String qualifySort(String sort, String tableAlias) {
+        if (StringUtils.isEmpty(sort)) {
+            return sort;
+        }
+        String[] split = sort.split(",", 2);
+        String column = split[0];
+        if (column.contains(".") || column.contains("`")) {
+            return sort;
+        }
+        String qualified = tableAlias + ".`" + column + "`";
+        return split.length > 1 ? qualified + "," + split[1] : qualified;
+    }
+
     public RS save(TClasses classes) {
         return classesMapper.insert(classes) == 0 ? RS.error("保存失败") : RS.ok("保存成功");
     }
 
     public IPage pageQuery(QueryClassesVO queryClassesVO, UserRealm realm) {
+        queryClassesVO.setSort(qualifySort(queryClassesVO.getSort(), "cs"));
         IPage<QueryClassesVO> iPage = null;
         Page page = getPage(queryClassesVO);
         Map<String, Object> map = new HashMap<>();
