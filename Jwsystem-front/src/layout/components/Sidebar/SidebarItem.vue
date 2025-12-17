@@ -23,7 +23,7 @@
     <el-submenu
       v-else
       ref="subMenu"
-      :index="resolvePath(item.path)"
+      :index="submenuIndex"
       popper-append-to-body
     >
       <template slot="title">
@@ -35,7 +35,7 @@
       </template>
       <sidebar-item
         v-for="child in item.children"
-        :key="child.path"
+        :key="child.id || child.path"
         :is-nest="true"
         :item="child"
         :base-path="resolvePath(child.path)"
@@ -77,9 +77,22 @@ export default {
     this.onlyOneChild = null;
     return {};
   },
+  computed: {
+    submenuIndex() {
+      const baseIndex = this.resolvePath(this.item.path);
+      if (this.item && this.item.id != null) {
+        return `${baseIndex}__${this.item.id}`;
+      }
+      if (this.item && this.item.name) {
+        return `${baseIndex}__${this.item.name}`;
+      }
+      return baseIndex;
+    }
+  },
   methods: {
-    hasOneShowingChild(children = [], parent) {
-      const showingChildren = children.filter(item => {
+    hasOneShowingChild(children, parent) {
+      const childList = Array.isArray(children) ? children : [];
+      const showingChildren = childList.filter(item => {
         if (item.hidden) {
           return false;
         } else {

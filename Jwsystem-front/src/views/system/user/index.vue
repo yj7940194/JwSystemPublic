@@ -213,30 +213,22 @@
             label="邮箱"
           />
           <el-table-column
-            v-if="columns.visible('dept')"
+            v-if="columns.visible('collegeName')"
             :show-overflow-tooltip="true"
-            width="110"
-            prop="dept"
-            label="部门 / 岗位"
-          >
-            <template slot-scope="scope">
-              <div>{{ scope.row.dept.name }} / {{ scope.row.job.name }}</div>
-            </template>
-          </el-table-column>
+            width="150"
+            prop="collegeName"
+            label="学院"
+          />
           <el-table-column
-            v-if="columns.visible('enabled')"
+            v-if="columns.visible('status')"
             label="状态"
             align="center"
-            prop="enabled"
+            prop="status"
           >
             <template slot-scope="scope">
-              <el-switch
-                v-model="scope.row.enabled"
-                :disabled="user.id === scope.row.id"
-                active-color="#409EFF"
-                inactive-color="#F56C6C"
-                @change="changeEnabled(scope.row, scope.row.enabled)"
-              />
+               <el-tag :type="scope.row.status == '1' ? 'success' : 'danger'">
+                {{ scope.row.status == '1' ? '激活' : '锁定' }}
+              </el-tag>
             </template>
           </el-table-column>
           <el-table-column
@@ -292,7 +284,7 @@ let userRoles = [];
 // crud交由presenter持有
 const defaultCrud = CRUD({
   title: "用户",
-  url: "api/user",
+  url: "api/user/pageQuery",
   crudMethod: { ...crudUser }
 });
 const defaultForm = {

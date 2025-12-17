@@ -25,6 +25,20 @@ public class VisitsServiceImpl extends BaseService implements VisitsService {
     @Autowired
     private VisitsMapper visitsMapper;
 
+    private Visits createTodayIfAbsent(LocalDate localDate, long pvCounts, long ipCounts) {
+        Visits visits = visitsMapper.selectOne(this.queryOne("date", localDate.toString()));
+        if (visits != null) {
+            return visits;
+        }
+        Visits created = new Visits();
+        created.setWeekDay(getWeekDay());
+        created.setPvCounts(pvCounts);
+        created.setIpCounts(ipCounts);
+        created.setDate(localDate.toString());
+        visitsMapper.insert(created);
+        return created;
+    }
+
     @Override
     public void save() {
         LocalDate localDate = LocalDate.now();
@@ -44,9 +58,13 @@ public class VisitsServiceImpl extends BaseService implements VisitsService {
     public void count() {
         LocalDate localDate = LocalDate.now();
         Visits visits = visitsMapper.selectOne(this.queryOne("date", localDate.toString()));
+        if (visits == null) {
+            createTodayIfAbsent(localDate, 1L, 10L);
+            return;
+        }
         visits.setPvCounts(visits.getPvCounts() + 1);
-//        long ipCounts = logRepository.findIp(localDate.toString(), localDate.plusDays(1).toString());
-        visits.setIpCounts((long) 10);
+        // long ipCounts = logRepository.findIp(localDate.toString(), localDate.plusDays(1).toString());
+        visits.setIpCounts(10L);
         visitsMapper.updateById(visits);
     }
 
@@ -63,8 +81,8 @@ public class VisitsServiceImpl extends BaseService implements VisitsService {
             recentVisits += data.getPvCounts();
             recentIp += data.getIpCounts();
         }
-        map.put("newVisits", visits.getPvCounts());
-        map.put("newIp", visits.getIpCounts());
+        map.put("newVisits", visits == null ? 0 : visits.getPvCounts());
+        map.put("newIp", visits == null ? 0 : visits.getIpCounts());
         map.put("recentVisits", recentVisits);
         map.put("recentIp", recentIp);
         return map;

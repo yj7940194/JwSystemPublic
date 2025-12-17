@@ -17,7 +17,7 @@ service.interceptors.request.use(
     // if (getToken()) {
     //   config.headers['Authorization'] = getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
     // }
-    config.headers['Content-Type'] = 'application/json'
+    // 不强制覆盖 Content-Type，交给 axios 根据数据类型自动设置
     return config
   },
   error => {

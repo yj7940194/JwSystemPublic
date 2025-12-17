@@ -127,8 +127,8 @@ function CRUD(options) {
         crud.loading = true
         // 请求数据
         initData(crud.url, crud.getQueryParams()).then(data => {
-          crud.page.total = data.totalElements
-          crud.data = data.content
+          crud.page.total = data.total || data.totalElements
+          crud.data = data.rows || data.content
           crud.resetDataStatus()
           // time 毫秒后显示表格
           setTimeout(() => {

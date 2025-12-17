@@ -1,46 +1,33 @@
 <template>
   <div class="dashboard-container">
     <div class="dashboard-editor-container" v-if="qx == '管理员'">
-      <panel-group />
-      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
-        <line-chart />
-      </el-row>
+      <div class="panel-card">
+        <admin-panel />
+      </div>
     </div>
     <div class="dashboard-editor-container" v-if="qx == '教务人员'">
-      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+      <div class="panel-card">
         <jw-panel />
-      </el-row>
+      </div>
     </div>
     <div class="dashboard-editor-container" v-if="qx == '讲师'">
-      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+      <div class="panel-card">
         <teacher-panel />
-      </el-row>
+      </div>
     </div>
     <div class="dashboard-editor-container" v-if="qx == '学生'">
-      <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
-       <student-panel/>
-      </el-row>
+      <div class="panel-card">
+        <student-panel />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import PanelGroup from './dashboard/PanelGroup'
-import LineChart from './dashboard/LineChart'
+import AdminPanel from './dashboard/AdminPanel'
 import jwPanel from './dashboard/jw/jwPanel'
 import studentPanel from './dashboard/student/studentPanel'
 import teacherPanel from './dashboard/teacher/teacherPanel'
-
-// import RadarChart from '@/components/Echarts/RadarChart'
-// import PieChart from '@/components/Echarts/PieChart'
-// import BarChart from '@/components/Echarts/BarChart'
-import { count } from '@/api/monitor/visits'
-
-/**
- * 记录访问，只有页面刷新或者第一次加载才会记录
- */
-count().then(res => {
-})
 
 export default {
   name: 'Dashboard',
@@ -50,8 +37,7 @@ export default {
     }
   },
   components: {
-    PanelGroup,
-    LineChart,
+    AdminPanel,
     jwPanel,
     studentPanel,
     teacherPanel
@@ -63,13 +49,28 @@ export default {
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
+  .dashboard-container {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 84px);
+    padding: 16px 20px 24px;
+    background: #f5f7fa;
+  }
+
   .dashboard-editor-container {
-    padding: 18px 22px 22px 22px;
-    background-color: rgb(240, 242, 245);
-    .chart-wrapper {
-      background: #fff;
-      padding: 16px 16px 0;
-      margin-bottom: 32px;
-    }
+    flex: 1;
+    padding: 0;
+    margin: 0;
+    min-height: 0; /* allow child to stretch */
+  }
+
+  .panel-card {
+    height: 100%;
+    background: #fff;
+    padding: 16px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
   }
 </style>

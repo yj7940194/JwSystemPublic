@@ -17,7 +17,13 @@ public class WebMvcConfigurerConfig implements WebMvcConfigurer {
     private String filepath;
     private CorsConfiguration buildConfig() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.addAllowedOrigin("*");
+        corsConfiguration.addAllowedOrigin("http://localhost:8080");
+        corsConfiguration.addAllowedOrigin("http://localhost:8081");
+        corsConfiguration.addAllowedOrigin("http://localhost:8083");
+        // 兼容使用 127.0.0.1 访问前端/后端的情况（否则会触发 “Invalid CORS request”）
+        corsConfiguration.addAllowedOrigin("http://127.0.0.1:8080");
+        corsConfiguration.addAllowedOrigin("http://127.0.0.1:8081");
+        corsConfiguration.addAllowedOrigin("http://127.0.0.1:8083");
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.addAllowedMethod("*");

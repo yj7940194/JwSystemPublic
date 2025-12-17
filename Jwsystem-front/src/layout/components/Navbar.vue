@@ -68,10 +68,10 @@
 import { mapGetters } from "vuex";
 import Breadcrumb from "@/components/Breadcrumb";
 import Hamburger from "@/components/Hamburger";
-import Github from "@/components/Github";
 import Screenfull from "@/components/Screenfull";
 import SizeSelect from "@/components/SizeSelect";
 import Search from "@/components/HeaderSearch";
+import Github from "@/components/Github";
 import Avatar from "@/assets/images/avatar.png";
 
 export default {

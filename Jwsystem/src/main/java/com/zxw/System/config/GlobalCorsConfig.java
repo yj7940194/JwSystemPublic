@@ -13,7 +13,13 @@ public class GlobalCorsConfig {
         //1.添加CORS配置信息
         CorsConfiguration config = new CorsConfiguration();
         //1) 允许的域,不要写*，否则cookie就无法使用了
+        config.addAllowedOrigin("http://localhost:8080");
         config.addAllowedOrigin("http://localhost:8081");
+        config.addAllowedOrigin("http://localhost:8083");
+        // 兼容使用 127.0.0.1 访问前端/后端的情况（否则会触发 “Invalid CORS request”）
+        config.addAllowedOrigin("http://127.0.0.1:8080");
+        config.addAllowedOrigin("http://127.0.0.1:8081");
+        config.addAllowedOrigin("http://127.0.0.1:8083");
         //2) 是否发送Cookie信息
         config.setAllowCredentials(true);
         //3) 允许的请求方式

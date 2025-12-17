@@ -3,6 +3,21 @@ HELP.md
 /Jwsystem-front/node_modules/
 /src/main/resources/front/front/node_modules/
 
+.env.local
+/Jwsystem/images/
+
+# Local dev / runtime artifacts (repo root)
+/.venv/
+/node_modules/
+/*.log
+/*.pid
+/*.png
+/mcp-monitor/
+/mcp-monitor.log
+/mcp-monitor.pid
+/main.jsonl
+/Jwsystem/backend_manual.log
+
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

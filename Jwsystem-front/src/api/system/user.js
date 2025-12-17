@@ -3,7 +3,7 @@ import { encrypt } from "@/utils/rsaEncrypt";
 
 export function add(data) {
   return request({
-    url: "api/user",
+    url: "api/user/add",
     method: "post",
     data
   });
@@ -11,7 +11,7 @@ export function add(data) {
 
 export function del(ids) {
   return request({
-    url: "api/user",
+    url: "api/user/delete",
     method: "delete",
     data: ids
   });
@@ -19,7 +19,7 @@ export function del(ids) {
 
 export function edit(data) {
   return request({
-    url: "api/user",
+    url: "api/user/edit",
     method: "put",
     data
   });

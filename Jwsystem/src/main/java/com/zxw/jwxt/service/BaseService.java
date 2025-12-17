@@ -19,9 +19,18 @@ public class BaseService {
     public Page getPage(BaseQueryParam baseQueryParam) {
         Page page = new Page(baseQueryParam.getOffset(), baseQueryParam.getLimit());
         if (baseQueryParam.getSort() != null) {
+            String sort = baseQueryParam.getSort();
+            boolean isAsc = baseQueryParam.isASC();
+            if (sort.contains(",")) {
+                String[] split = sort.split(",");
+                sort = split[0];
+                if (split.length > 1) {
+                    isAsc = "asc".equalsIgnoreCase(split[1]);
+                }
+            }
             OrderItem orderItems = new OrderItem();
-            orderItems.setColumn(baseQueryParam.getSort());
-            orderItems.setAsc(baseQueryParam.isASC());
+            orderItems.setColumn(sort);
+            orderItems.setAsc(isAsc);
             page.addOrder(orderItems);
         }
         return page;
@@ -45,7 +54,16 @@ public class BaseService {
             queryWrapper.groupBy(baseQueryParam.getGroupBy());
         }
         if (StringUtils.isNotEmpty(baseQueryParam.getSort())) {
-            queryWrapper.orderBy(true, baseQueryParam.isASC(), baseQueryParam.getSort());
+            String sort = baseQueryParam.getSort();
+            boolean isAsc = baseQueryParam.isASC();
+            if (sort.contains(",")) {
+                String[] split = sort.split(",");
+                sort = split[0];
+                if (split.length > 1) {
+                    isAsc = "asc".equalsIgnoreCase(split[1]);
+                }
+            }
+            queryWrapper.orderBy(true, isAsc, sort);
         }
         if (params.length != 0) {
             Map<String, Object> map = (Map<String, Object>) params[0];
