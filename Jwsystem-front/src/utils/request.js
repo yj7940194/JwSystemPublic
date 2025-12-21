@@ -41,20 +41,24 @@ service.interceptors.response.use(
     }
   },
   error => {
-    let code = 0
-    try {
-      code = error.response.data.status
-    } catch (e) {
-      if (error.toString().indexOf('Error: timeout') !== -1) {
+    const code = error && error.response && error.response.status
+
+    if (!code) {
+      if (error && error.toString().indexOf('Error: timeout') !== -1) {
         Notification.error({
           title: '网络请求超时',
           duration: 5000
         })
         return Promise.reject(error)
       }
+      Notification.error({
+        title: '接口请求失败',
+        duration: 5000
+      })
+      return Promise.reject(error)
     }
-    if (code) {
-      if (code === 401) {
+
+    if (code === 401) {
         MessageBox.confirm(
           '登录状态已过期，您可以继续留在该页面，或者重新登录',
           '系统提示',
@@ -68,22 +72,17 @@ service.interceptors.response.use(
             location.reload() // 为了重新实例化vue-router对象 避免bug
           })
         })
-      } else if (code === 403) {
-        router.push({ path: '/401' })
-      } else {
-        const errorMsg = error.response.data.message
-        if (errorMsg !== undefined) {
-          Notification.error({
-            title: errorMsg,
-            duration: 5000
-          })
-        }
-      }
+    } else if (code === 403) {
+      router.push({ path: '/401' })
     } else {
-      Notification.error({
-        title: '接口请求失败',
-        duration: 5000
-      })
+      const data = error && error.response && error.response.data
+      const errorMsg = data && (data.msg || data.message || data.error)
+      if (errorMsg !== undefined) {
+        Notification.error({
+          title: errorMsg,
+          duration: 5000
+        })
+      }
     }
     return Promise.reject(error)
   }

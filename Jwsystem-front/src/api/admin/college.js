@@ -9,10 +9,11 @@ export function add(data) {
 }
 
 export function del(id) {
+  const ids = Array.isArray(id) ? id : [id]
   return request({
     url: 'api/college/deleteCollege',
     method: 'delete',
-    params: { id }
+    params: { id: ids.join(',') }
   })
 }
 

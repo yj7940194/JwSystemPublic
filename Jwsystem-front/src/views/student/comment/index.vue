@@ -1,5 +1,22 @@
 <template>
   <div class="app-container">
+    <el-card v-if="!isStudent" shadow="never">
+      <div slot="header" class="clearfix">
+        <span>学生评价</span>
+      </div>
+      <el-alert
+        type="info"
+        show-icon
+        :closable="false"
+        title="该页面为“学生评价”入口"
+        description="当前账号不是学生，无法加载待评任务。请使用学生账号登录进行评价；管理员/教务可前往“发布评价/评价查询”等页面。"
+      />
+      <div style="margin-top: 12px;">
+        <el-button size="small" type="primary" @click="goAdminComment">打开发布评价</el-button>
+      </div>
+    </el-card>
+
+    <template v-else>
     <el-card shadow="never" class="mb-2">
       <div slot="header" class="clearfix">
         <span>学生评价</span>
@@ -136,6 +153,7 @@
         </el-button>
       </div>
     </el-dialog>
+    </template>
   </div>
 </template>
 
@@ -178,6 +196,10 @@ export default {
     }
   },
   computed: {
+    isStudent() {
+      const user = this.$store && this.$store.state && this.$store.state.user && this.$store.state.user.user
+      return user && user.qx === '学生'
+    },
     selectedBatch() {
       return this.batches.find((b) => b.id === this.selectedBatchId) || null
     },
@@ -241,9 +263,13 @@ export default {
     }
   },
   created() {
-    this.fetchBatches()
+    if (this.isStudent) this.fetchBatches()
   },
   methods: {
+    goAdminComment() {
+      // 管理端“发布评价”页面（如无权限，会被路由守卫拦截）
+      this.$router.push('/admin/comment')
+    },
     resetDetailForm() {
       this.detailForm = {
         q1: 5,

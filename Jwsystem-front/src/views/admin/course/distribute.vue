@@ -52,9 +52,14 @@ export default {
           // 复用后端 /api/course/pageQuery，返回的 rows 中 id 为 teacher_course.id，name 为课程名
           request.get('api/course/pageQuery', { params: { offset: 1, limit: 9999 } }).then(res => {
             const rows = (res && res.rows) || []
-            this.courses = rows.map(r => ({ id: r.id, name: r.name }))
+            const list = Array.isArray(rows) ? rows : []
+            this.courses = list
+              .map(r => ({ id: r && r.id, name: r && r.name, people: Number(r && r.people) || 0 }))
+              .filter(r => r && r.id && r.name)
+              .sort((a, b) => (b.people || 0) - (a.people || 0))
             if (!this.query.id && this.courses.length) {
-              this.query.id = this.courses[0].id
+              const preferred = this.courses.find(c => (c.people || 0) > 0) || this.courses[0]
+              this.query.id = preferred.id
               // 自动加载首个课程的学生列表，避免页面一进来就是“暂无数据”
               this.$nextTick(() => this.crud.toQuery())
             }

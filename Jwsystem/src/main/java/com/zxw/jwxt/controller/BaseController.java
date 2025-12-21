@@ -2,6 +2,7 @@ package com.zxw.jwxt.controller;
 
 import com.zxw.jwxt.domain.UserRealm;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 
@@ -12,9 +13,7 @@ import org.apache.shiro.subject.Subject;
 public class BaseController {
 
     public String getUserId() {
-        Subject subject = SecurityUtils.getSubject();
-        UserRealm user = (UserRealm) subject.getPrincipal();
-        return user.getId();
+        return getRealm().getId();
     }
 
     public String getUserQx() {
@@ -23,8 +22,12 @@ public class BaseController {
     }
 
     public UserRealm getRealm() {
-        UserRealm principal = (UserRealm) SecurityUtils.getSubject().getPrincipal();
-        return principal;
+        Subject subject = SecurityUtils.getSubject();
+        Object principal = subject.getPrincipal();
+        if (principal instanceof UserRealm) {
+            return (UserRealm) principal;
+        }
+        throw new UnauthenticatedException("未登录或会话已过期");
     }
 
     public String loginType(){

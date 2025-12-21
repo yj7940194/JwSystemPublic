@@ -9,11 +9,14 @@ export function add(data) {
 }
 
 export function del(tid) {
-  return request({
-    url: 'api/teacher',
-    method: 'delete',
-    params: { tid }
-  })
+  const ids = Array.isArray(tid) ? tid : [tid]
+  return Promise.all(
+    ids.map(id => request({
+      url: 'api/teacher',
+      method: 'delete',
+      params: { tid: id }
+    }))
+  )
 }
 
 export function edit(data) {

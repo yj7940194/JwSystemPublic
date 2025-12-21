@@ -1,0 +1,96 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Boot services (docker compose)
+        run: |
+          JW_CAPTCHA_BYPASS=true docker compose up -d --build
+
+      - name: Wait for frontend
+        run: |
+          for i in $(seq 1 300); do
+            code="$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8081/ || true)"
+            if [ "$code" != "000" ]; then
+              echo "Frontend reachable (http_code=$code)"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Frontend not reachable after 600s" >&2
+          docker compose ps
+          docker compose logs --no-color --tail=200
+          exit 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install e2e deps (root)
+        run: npm ci
+
+      - name: E2E smoke
+        run: |
+          node scripts/jwsystem_e2e_smoke.js <<'JSON'
+          {
+            "baseUrl": "http://127.0.0.1:8081",
+            "reportPath": "/tmp/jwsystem_e2e_smoke_report_ci.json",
+            "roles": [
+              {"roleLabel":"管理员","username":"1","password":"123456","checkcode":"1"},
+              {"roleLabel":"教务人员","username":"3","password":"123456","checkcode":"1"},
+              {"roleLabel":"教师","username":"9","password":"123456","checkcode":"1"},
+              {"roleLabel":"学生","username":"20001","password":"123456","checkcode":"1"}
+            ]
+          }
+          JSON
+
+      - name: UI data check
+        run: |
+          node scripts/jwsystem_ui_data_check.js <<'JSON'
+          {
+            "baseUrl": "http://127.0.0.1:8081",
+            "reportPath": "/tmp/jwsystem_ui_data_check_report_ci.json",
+            "roles": [
+              {"roleLabel":"管理员","username":"1","password":"123456","checkcode":"1"},
+              {"roleLabel":"教务人员","username":"3","password":"123456","checkcode":"1"},
+              {"roleLabel":"教师","username":"9","password":"123456","checkcode":"1"},
+              {"roleLabel":"学生","username":"20001","password":"123456","checkcode":"1"}
+            ]
+          }
+          JSON
+
+      - name: Empty page scan
+        run: |
+          node scripts/jwsystem_empty_pages_scan.js <<'JSON'
+          {
+            "baseUrl": "http://127.0.0.1:8081",
+            "reportPath": "/tmp/jwsystem_empty_pages_report_ci.json",
+            "roles": [
+              {"roleLabel":"管理员","username":"1","password":"123456","checkcode":"1"},
+              {"roleLabel":"教务人员","username":"3","password":"123456","checkcode":"1"},
+              {"roleLabel":"教师","username":"9","password":"123456","checkcode":"1"},
+              {"roleLabel":"学生","username":"20001","password":"123456","checkcode":"1"}
+            ]
+          }
+          JSON
+
+      - name: Compose logs (on failure)
+        if: failure()
+        run: docker compose logs --no-color
+
+      - name: Teardown
+        if: always()
+        run: docker compose down -v
+

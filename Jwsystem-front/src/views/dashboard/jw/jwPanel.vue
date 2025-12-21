@@ -84,13 +84,20 @@
     },
     data() {
       return {
-        data: null,
-        isAdd: true,
+        data: {
+          absentCount: [],
+          downCourseSectionRate: [],
+          downCourseRate: [],
+          noticeList: [],
+          countGrade: []
+        },
+        isAdd: true
       }
     },
     created() {
       count.findUserPanel().then(res => {
-        this.data = res
+        const payload = res || {}
+        this.data = Object.assign({}, this.data, payload)
       })
     },
     mounted() {

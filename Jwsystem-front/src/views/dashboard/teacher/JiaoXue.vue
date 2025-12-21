@@ -14,7 +14,8 @@
   export default {
     props: {
       data: {
-        type: Object
+        type: Object,
+        default: () => ({ finishNum: 0, unFinishNum: 0 })
       },
       className: {
         type: String,
@@ -34,29 +35,26 @@
         chart: null,
         trueNum: null,
         total: null,
-        falseNum: null,
-        data: [{
-          name: 'Apples',
-          value: 70
-        }, {
-          name: 'Strawberries',
-          value: 68
-        }, {
-          name: 'Bananas',
-          value: 48
-        }, {
-          name: 'Oranges',
-          value: 40
-        }, {
-          name: 'Pears',
-          value: 32
-        }, {
-          name: 'Pineapples',
-          value: 27
-        }, {
-          name: 'Grapes',
-          value: 18
-        }]
+        falseNum: null
+      }
+    },
+    watch: {
+      data: {
+        deep: true,
+        handler() {
+          if (!this.chart) return
+          const payload = this.getPayload()
+          this.chart.setOption({
+            series: [
+              {
+                data: [
+                  { value: payload.finishNum, name: '已完成' },
+                  { value: payload.unFinishNum, name: '未完成' }
+                ]
+              }
+            ]
+          })
+        }
       }
     },
     mounted() {
@@ -87,7 +85,15 @@
       this.chart = null
     },
     methods: {
+      getPayload() {
+        const d = this.data || {}
+        return {
+          finishNum: Number(d.finishNum || 0),
+          unFinishNum: Number(d.unFinishNum || 0)
+        }
+      },
       initChart() {
+        const payload = this.getPayload()
         this.chart = echarts.init(this.$el, 'macarons')
         this.chart.setOption({
           title: {
@@ -110,8 +116,8 @@
               radius: '55%',
               center: ['50%', '60%'],
               data: [
-                {value: this.data.finishNum, name: '已完成'},
-                {value: this.data.unFinishNum, name: '未完成'},
+                { value: payload.finishNum, name: '已完成' },
+                { value: payload.unFinishNum, name: '未完成' }
               ],
               emphasis: {
                 itemStyle: {

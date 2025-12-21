@@ -18,6 +18,9 @@ import java.util.List;
  */
 public interface PlanMapper extends BaseMapper<Plan> {
 
-    @Select("select p.*,t.`name` from `plan` p,`t_year` t where p.`year_id` = t.`id` and p.`specialty_id` = #{specialtyId}")
+    @Select("SELECT p.id, p.name, p.year_id AS yearId, sp.`name` AS sname " +
+            "FROM `plan` p " +
+            "LEFT JOIN `t_specialty` sp ON p.`specialty_id` = sp.`id` " +
+            "WHERE (#{specialtyId} IS NULL OR #{specialtyId} = '' OR p.`specialty_id` = #{specialtyId})")
     List<PlanDTO> listajax(@Param("specialtyId") String specialtyId);
 }

@@ -63,7 +63,8 @@ export default {
       this.loading = true;
       request.get('/api/score/findSelectCourseByStudentId')
         .then(res => {
-          this.courseList = res.data;
+          const payload = res && res.data ? res.data : res
+          this.courseList = Array.isArray(payload) ? payload : []
         })
         .catch(err => {
           console.error(err);

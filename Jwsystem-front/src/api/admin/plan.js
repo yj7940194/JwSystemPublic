@@ -17,11 +17,14 @@ export function edit(data) {
 }
 
 export function del(id) {
-  return request({
-    url: 'api/plan',
-    method: 'delete',
-    params: { id }
-  })
+  const ids = Array.isArray(id) ? id : [id]
+  return Promise.all(
+    ids.map(itemId => request({
+      url: 'api/plan',
+      method: 'delete',
+      params: { id: itemId }
+    }))
+  )
 }
 
 export default { add, edit, del }

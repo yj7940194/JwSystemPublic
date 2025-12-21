@@ -10,6 +10,7 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.StringJoiner;
 import java.util.UUID;
 
 /**
@@ -27,6 +27,14 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api")
 public class LoginController extends BaseController {
+
+    /**
+     * CI/自动化场景可通过环境变量开启跳过验证码校验：
+     *   JW_CAPTCHA_BYPASS=true
+     * 默认为 false，生产/日常使用保持验证码生效。
+     */
+    @Value("${jw.captcha.bypass:false}")
+    private boolean captchaBypass;
 
     /**
      * 登录功能
@@ -41,26 +49,31 @@ public class LoginController extends BaseController {
     @PostMapping("/login")
     @ResponseBody
     public ResponseEntity login(String username, String password, String checkcode, String RadioButtonList1, HttpServletRequest request) {
-        if (checkcode != null && !"".equals(checkcode)) {
+        if (checkcode == null || checkcode.trim().isEmpty()) {
+            throw new BadRequestException("验证码不能为空");
+        }
+
+        if (!captchaBypass) {
             HttpSession session = request.getSession();
-            System.out.println(session);
-            //String code = (String) session.getAttribute(new StringJoiner("_").add("code").add(session.getId()).toString());
-            //if (checkcode.equals(code)) {
-                Subject subject = SecurityUtils.getSubject();
-                AuthenticationToken token = new UsernamePasswordToken(username, password);
-                try {
-                    subject.getSession().setAttribute("RadioButtonList1", RadioButtonList1);
-                    System.out.println(token);
-                    subject.login(token);
-                } catch (AuthenticationException e) {
-                    throw new BadRequestException("用户名或密码错误");
-                }
-                getRealm().setToken(UUID.randomUUID().toString());
-                return ResponseEntity.ok(getRealm());
+            String sessionKey = "code_" + session.getId();
+            Object expected = session.getAttribute(sessionKey);
+            if (expected == null || !checkcode.trim().equalsIgnoreCase(String.valueOf(expected))) {
+                throw new BadRequestException("验证码错误");
             }
-            throw new BadRequestException("验证码错误");
-        //}
-       // throw new BadRequestException("验证码不能为空");
+            // 一次性验证码，验证成功后清理
+            session.removeAttribute(sessionKey);
+        }
+
+        Subject subject = SecurityUtils.getSubject();
+        AuthenticationToken token = new UsernamePasswordToken(username, password);
+        try {
+            subject.getSession().setAttribute("RadioButtonList1", RadioButtonList1);
+            subject.login(token);
+        } catch (AuthenticationException e) {
+            throw new BadRequestException("用户名或密码错误");
+        }
+        getRealm().setToken(UUID.randomUUID().toString());
+        return ResponseEntity.ok(getRealm());
     }
 
     /**

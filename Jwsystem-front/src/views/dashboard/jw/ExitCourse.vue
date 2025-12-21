@@ -19,7 +19,7 @@
       },
       data: {
         type: Array,
-        required: false
+        default: () => Array.from({ length: 7 }, () => [0, 0, 0, 0, 0])
       },
       width: {
         type: String,
@@ -36,6 +36,23 @@
         trueNum: null,
         total: null,
         falseNum: null,
+      }
+    },
+    watch: {
+      data: {
+        deep: true,
+        handler() {
+          if (!this.chart) return
+          this.chart.setOption({
+            series: [
+              { data: this.getSeriesData(0) },
+              { data: this.getSeriesData(1) },
+              { data: this.getSeriesData(2) },
+              { data: this.getSeriesData(3) },
+              { data: this.getSeriesData(4) }
+            ]
+          })
+        }
       }
     },
     mounted() {
@@ -66,6 +83,15 @@
       this.chart = null
     },
     methods: {
+      getSeriesData(colIndex) {
+        const rows = Array.isArray(this.data) ? this.data : []
+        const out = []
+        for (let i = 0; i < 7; i++) {
+          const row = Array.isArray(rows[i]) ? rows[i] : []
+          out.push(Number(row[colIndex] || 0))
+        }
+        return out
+      },
       initChart() {
         this.chart = echarts.init(this.$el, 'macarons')
         this.chart.setOption({
@@ -111,27 +137,27 @@
             {
               name: '1-2节',
               type: 'bar',
-              data: [this.data[0][0], this.data[1][0], this.data[2][0], this.data[3][0], this.data[4][0], this.data[5][0], this.data[6][0]]
+              data: this.getSeriesData(0)
             },
             {
               name: '3-4节',
               type: 'bar',
-              data: [this.data[0][1], this.data[1][1], this.data[2][1], this.data[3][1], this.data[4][1], this.data[5][1], this.data[6][1]]
+              data: this.getSeriesData(1)
             },
             {
               name: '5-6节',
               type: 'bar',
-              data: [this.data[0][2], this.data[1][2], this.data[2][2], this.data[3][2], this.data[4][2], this.data[5][2], this.data[6][2]]
+              data: this.getSeriesData(2)
             },
             {
               name: '7-8节',
               type: 'bar',
-              data: [this.data[0][3], this.data[1][3], this.data[2][3], this.data[3][3], this.data[4][3], this.data[5][3], this.data[6][3]]
+              data: this.getSeriesData(3)
             },
             {
               name: '9-10节',
               type: 'bar',
-              data: [this.data[0][4], this.data[1][4], this.data[2][4], this.data[3][4], this.data[4][4], this.data[5][4], this.data[6][4]],
+              data: this.getSeriesData(4),
             }
           ]
         })

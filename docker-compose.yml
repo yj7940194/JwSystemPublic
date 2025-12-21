@@ -1,0 +1,74 @@
+services:
+  db:
+    image: mysql:8.0.33
+    restart: unless-stopped
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-jw_springboot}
+      MYSQL_USER: ${MYSQL_USER:-jw_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-jw_password}
+    volumes:
+      - jw_db_data:/var/lib/mysql
+      - ./Jwsystem/115jw-springboot.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+      - ./scripts/seed_demo_data.sql:/docker-entrypoint-initdb.d/02_seed_demo_data.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  backend:
+    image: maven:3.9.10-eclipse-temurin-8
+    working_dir: /workspace/Jwsystem
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      TZ: Asia/Shanghai
+      JW_DB_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE:-jw_springboot}?characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      JW_DB_USER: ${MYSQL_USER:-jw_user}
+      JW_DB_PASSWORD: ${MYSQL_PASSWORD:-jw_password}
+      JW_CAPTCHA_BYPASS: ${JW_CAPTCHA_BYPASS:-false}
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./Jwsystem:/workspace/Jwsystem:cached
+      - m2:/root/.m2
+    command: mvn -DskipTests spring-boot:run
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    working_dir: /workspace/Jwsystem-front
+    depends_on:
+      - backend
+    environment:
+      # Browser-side base API (reachable from host). DevServer proxy uses VUE_APP_PROXY_TARGET.
+      VUE_APP_BASE_API: http://127.0.0.1:8080
+      VUE_APP_PROXY_TARGET: http://backend:8080
+      # Fix HMR sockjs hostname when running inside Docker.
+      DEV_SERVER_PUBLIC: 127.0.0.1:8081
+      CHOKIDAR_USEPOLLING: "true"
+      HOST: 0.0.0.0
+      PORT: 8081
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./Jwsystem-front:/workspace/Jwsystem-front:cached
+      - frontend_node_modules:/workspace/Jwsystem-front/node_modules
+    command: >
+      bash -lc
+      "if [ ! -d node_modules ] || [ -z \"$(ls -A node_modules 2>/dev/null)\" ];
+      then npm ci; fi;
+      npm run dev -- --host 0.0.0.0 --port 8081"
+
+volumes:
+  jw_db_data:
+  m2:
+  frontend_node_modules:

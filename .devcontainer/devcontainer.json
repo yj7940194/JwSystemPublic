@@ -1,0 +1,16 @@
+{
+  "name": "JwSystemPublic (DevContainer)",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+  "remoteUser": "ubuntu",
+  "forwardPorts": [8080, 8081, 3306],
+  "postCreateCommand": "bash -lc \"cd Jwsystem-front && npm ci\"",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  }
+}

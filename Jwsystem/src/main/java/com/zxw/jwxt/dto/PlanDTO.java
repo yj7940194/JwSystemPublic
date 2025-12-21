@@ -36,6 +36,8 @@ public class PlanDTO {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String yearId;
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private String sname;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String tname;
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private String nname;

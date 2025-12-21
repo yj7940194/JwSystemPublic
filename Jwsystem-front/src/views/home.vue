@@ -10,7 +10,7 @@
         <jw-panel />
       </div>
     </div>
-    <div class="dashboard-editor-container" v-if="qx == '讲师'">
+    <div class="dashboard-editor-container" v-if="qx == '讲师' || qx == '教师' || qx == '院长'">
       <div class="panel-card">
         <teacher-panel />
       </div>

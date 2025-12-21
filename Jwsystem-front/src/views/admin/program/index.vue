@@ -62,7 +62,14 @@ export default {
   methods: {
     getSpecialties() {
       getSpecialties().then(res => {
-        this.specialties = res
+        const payload = res && res.data ? res.data : res
+        const list = Array.isArray(payload)
+          ? payload
+          : (payload && Array.isArray(payload.rows) ? payload.rows : [])
+        this.specialties = list
+        if (!this.query.specialtyId && this.specialties.length) {
+          this.query.specialtyId = this.specialties[0].id
+        }
       })
     },
     handleQuery() {

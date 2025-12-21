@@ -27,17 +27,41 @@
       </el-col>
     </el-row>
 
-    <el-card shadow="never" class="mt-2">
-      <div slot="header" class="clearfix">
-        <span>说明</span>
-      </div>
-      <el-alert
-        type="info"
-        show-icon
-        :closable="false"
-        title="首页默认展示系统概览数据（学生/教师/课程/评价批次）。如需运行监控图表，可单独放到“系统监控”页面。"
-      />
-    </el-card>
+    <el-row :gutter="16" class="mt-2">
+      <el-col :xs="24" :md="14">
+        <el-card shadow="never" class="card">
+          <div slot="header" class="clearfix">
+            <span>快捷入口</span>
+          </div>
+          <div class="quick-actions">
+            <el-button size="small" type="primary" plain @click="go('/admin/college')">学院管理</el-button>
+            <el-button size="small" type="primary" plain @click="go('/admin/specialty')">专业管理</el-button>
+            <el-button size="small" type="primary" plain @click="go('/admin/classes')">班级管理</el-button>
+            <el-button size="small" type="success" plain @click="go('/admin/plan')">教学执行</el-button>
+            <el-button size="small" type="success" plain @click="go('/admin/program')">培养方案</el-button>
+            <el-button size="small" type="warning" plain @click="go('/admin/score')">成绩统计</el-button>
+            <el-button size="small" type="info" plain @click="go('/admin/user')">用户管理</el-button>
+          </div>
+          <div class="tips">
+            <span>提示：</span>
+            <span>右上角可进入个人中心/退出登录；菜单支持搜索。</span>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :xs="24" :md="10">
+        <el-card shadow="never" class="card">
+          <div slot="header" class="clearfix">
+            <span>说明</span>
+          </div>
+          <el-alert
+            type="info"
+            show-icon
+            :closable="false"
+            title="首页展示系统概览与常用入口。若数据为空，可先导入初始化 SQL 或执行 demo seed。"
+          />
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
@@ -61,6 +85,9 @@ export default {
     this.fetchStats()
   },
   methods: {
+    go(path) {
+      if (this.$router && path) this.$router.push({ path })
+    },
     async fetchStats() {
       this.loading = true
       try {
@@ -90,6 +117,10 @@ export default {
   width: 100%;
 }
 
+.card {
+  border-radius: 10px;
+}
+
 .stat-card {
   min-height: 92px;
 }
@@ -110,5 +141,17 @@ export default {
 
 .mt-2 {
   margin-top: 12px;
+}
+
+.quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tips {
+  margin-top: 12px;
+  color: #909399;
+  font-size: 12px;
 }
 </style>

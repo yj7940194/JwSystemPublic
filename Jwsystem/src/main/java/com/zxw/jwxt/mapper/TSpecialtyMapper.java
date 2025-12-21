@@ -22,18 +22,19 @@ import org.apache.ibatis.annotations.Update;
  */
 @Mapper
 public interface TSpecialtyMapper extends BaseMapper<TSpecialty> {
-    @Select("  SELECT DISTINCT s.`id`,\n" +
-            "                        s.`name`,\n" +
-            "                        s.`status`,s.`time`,s.`category`,\n" +
-            "                        s.`college_id`,\n" +
-            "                        c.`name` cname,\n" +
-            "                        c.`status`\n" +
-            "                                 cstatus,\n" +
-            "                        c.`id`   cid\n" +
-            "        FROM `t_specialty` s\n" +
-            "                 LEFT JOIN `t_college` c ON\n" +
-            "            s.`college_id` = c.`id` ORDER BY c.`name`")
-    IPage<QuerySpecialtyVO> findAll(Page page);
+    @Select("SELECT DISTINCT s.`id`,\n" +
+            "                s.`name`,\n" +
+            "                s.`status`,\n" +
+            "                s.`time`,\n" +
+            "                s.`category`,\n" +
+            "                s.`college_id`,\n" +
+            "                c.`name`  cname,\n" +
+            "                c.`status` cstatus,\n" +
+            "                c.`id`    cid\n" +
+            "FROM `t_specialty` s\n" +
+            "         LEFT JOIN `t_college` c ON s.`college_id` = c.`id`\n" +
+            "        ${ew.customSqlSegment}")
+    IPage<QuerySpecialtyVO> findAll(Page page, @Param(Constants.WRAPPER) Wrapper wrapper);
 
     @Select("select s.*,c.`name` cname,c.`status` cstatus from `t_specialty` s LEFT JOIN `t_college` c ON s.`college_id` = c.`id` ${ew.customSqlSegment}")
     IPage<QuerySpecialtyVO> findByJwUser(Page page, @Param(Constants.WRAPPER) Wrapper wrapper);

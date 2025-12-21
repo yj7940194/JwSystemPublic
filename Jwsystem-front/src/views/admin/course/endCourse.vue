@@ -39,7 +39,14 @@ import rrOperation from '@crud/RR.operation'
 import crudOperation from '@crud/CRUD.operation'
 import pagination from '@crud/Pagination'
 
-const defaultCrud = CRUD({ title: '结课申请', url: 'api/course/endApply', idField: 'id', sort: 'id,desc', crudMethod: { list: endApply } })
+const defaultCrud = CRUD({
+  title: '结课申请',
+  url: 'api/course/endApply',
+  idField: 'id',
+  sort: 'id,desc',
+  optShow: { add: false, edit: false, del: false, download: false },
+  crudMethod: { list: endApply }
+})
 
 export default {
   name: 'EndCourse',

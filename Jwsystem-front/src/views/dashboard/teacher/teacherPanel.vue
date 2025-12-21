@@ -88,7 +88,11 @@
     },
     data() {
       return {
-        data: null,
+        data: {
+          teacherSchedule: {},
+          courseList: [],
+          noticeList: []
+        },
         params: {
           teamId: null
         },
@@ -97,23 +101,24 @@
     },
     mounted() {
       common.listajaxTeam().then(res => {
-        this.team = res.records;
-        this.params.teamId = this.team[this.team.length - 1].id
-        this.load()
+        const rows = (res && (res.rows || res.records || res.content)) || []
+        this.team = rows
+        if (rows.length > 0) {
+          this.params.teamId = rows[rows.length - 1].id
+          this.load()
+        }
       })
     },
 
     methods: {
       load() {
         count.findTeacherPanel(this.params).then(res => {
-          this.data = res
-          console.log(this.$refs.kaoqin)
-          this.$refs.kaoqin.data = res.courseList
-          this.$refs.kaoqin.initChart()
+          const payload = res || {}
+          this.data = Object.assign({}, this.data, payload)
         })
       },
       change(val) {
-
+        this.load()
       },
       edit(data) {
         this.isAdd = false;

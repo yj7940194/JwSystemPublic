@@ -10,6 +10,7 @@ import com.zxw.jwxt.mapper.TClassesMapper;
 import com.zxw.jwxt.vo.QueryClassesVO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -49,22 +50,54 @@ public class ClassesService extends BaseService {
 
     public IPage pageQuery(QueryClassesVO queryClassesVO, UserRealm realm) {
         queryClassesVO.setSort(qualifySort(queryClassesVO.getSort(), "cs"));
-        IPage<QueryClassesVO> iPage = null;
         Page page = getPage(queryClassesVO);
         Map<String, Object> map = new HashMap<>();
+        Map<String, Object> keyword = new HashMap<>();
         map.put("cs.`college_id`", realm.getCollegeId());
         map.put("cs.`specialty_id`", queryClassesVO.getSpecialtyId());
         map.put("cs.`grade_id`", queryClassesVO.getGradeId());
-        if (StringUtils.isNotEmpty(realm.getCollegeId())) {
-            iPage = classesMapper.findByParams(page, this.getWrapper(queryClassesVO,null, map));
-        } else {
-            iPage = classesMapper.findAll(page);
+        if (StringUtils.isNotEmpty(queryClassesVO.getClassname())) {
+            keyword.put("cs.`classname`", queryClassesVO.getClassname());
         }
-        return iPage;
+        return classesMapper.findByParams(page, this.getWrapper(queryClassesVO, keyword, map));
+    }
+
+    public RS update(TClasses classes) {
+        if (classes == null || StringUtils.isBlank(classes.getId())) {
+            return RS.error(400, "缺少班级ID");
+        }
+        return classesMapper.updateById(classes) == 0 ? RS.error("更新失败") : RS.ok("更新成功");
+    }
+
+    public RS deleteById(String id) {
+        if (StringUtils.isBlank(id)) {
+            return RS.error(400, "缺少班级ID");
+        }
+        try {
+            return classesMapper.deleteById(id) == 0 ? RS.error("删除失败") : RS.ok("删除成功");
+        } catch (DataIntegrityViolationException e) {
+            return RS.error(400, "该班级下存在学生，无法删除");
+        }
     }
 
     public RS deleteBatch(QueryClassesVO classesVO) {
-        return RS.ok();
+        if (classesVO == null) {
+            return RS.error(400, "缺少参数");
+        }
+        if (classesVO.getCIds() != null && !classesVO.getCIds().isEmpty()) {
+            for (String id : classesVO.getCIds()) {
+                RS rs = deleteById(id);
+                Object code = rs.get("code");
+                if (code instanceof Integer && ((Integer) code) != 0) {
+                    return rs;
+                }
+            }
+            return RS.ok("删除成功");
+        }
+        if (StringUtils.isNotBlank(classesVO.getId())) {
+            return deleteById(classesVO.getId());
+        }
+        return RS.error(400, "请选择要删除的班级");
     }
 
     public List findClassesByGrade(QueryClassesVO classesVO, UserRealm realm) {

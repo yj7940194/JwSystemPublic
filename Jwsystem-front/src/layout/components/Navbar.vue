@@ -72,7 +72,7 @@ import Screenfull from "@/components/Screenfull";
 import SizeSelect from "@/components/SizeSelect";
 import Search from "@/components/HeaderSearch";
 import Github from "@/components/Github";
-import Avatar from "@/assets/images/avatar.png";
+import Avatar from "@/assets/images/avatar-default.svg";
 
 export default {
   components: {

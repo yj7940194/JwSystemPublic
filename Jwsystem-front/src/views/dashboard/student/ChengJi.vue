@@ -18,24 +18,24 @@
         default: 'chart'
       },
       gonggong: {
-        type: Array,
-        required: false
+        type: Number,
+        default: 0
       },
       xueke: {
-        type: Array,
-        required: false
+        type: Number,
+        default: 0
       },
       zhuanye: {
-        type: Array,
-        required: false
+        type: Number,
+        default: 0
       },
       tongshi: {
-        type: Array,
-        required: false
+        type: Number,
+        default: 0
       },
       shijian: {
-        type: Array,
-        required: false
+        type: Number,
+        default: 0
       },
       width: {
         type: String,

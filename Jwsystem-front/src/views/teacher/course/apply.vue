@@ -43,8 +43,36 @@
         </el-form-item>
       </el-form>
       
-      <el-divider content-position="left">申请记录</el-divider>
-      <el-empty description="暂无申请记录"></el-empty>
+      <el-divider content-position="left">
+        申请记录
+        <el-button style="float: right; padding: 3px 0" type="text" @click="loadApplyRecords">刷新</el-button>
+      </el-divider>
+
+      <el-table
+        v-if="applyRecords.length"
+        :data="applyRecords"
+        v-loading="recordsLoading"
+        size="small"
+        border
+        style="width: 100%"
+      >
+        <el-table-column label="课程" prop="name" min-width="160" />
+        <el-table-column label="上课时间" min-width="180">
+          <template slot-scope="scope">
+            {{ scope.row.sw }} {{ scope.row.sse }} / {{ scope.row.wname }}
+          </template>
+        </el-table-column>
+        <el-table-column label="教室" prop="classroom" width="120" align="center" />
+        <el-table-column label="容量" prop="totalPeople" width="90" align="center" />
+        <el-table-column label="状态" width="110" align="center">
+          <template slot-scope="scope">
+            <el-tag v-if="Number(scope.row.apply) === 1" type="success">已通过</el-tag>
+            <el-tag v-else-if="Number(scope.row.apply) === 2" type="danger">已驳回</el-tag>
+            <el-tag v-else type="warning">待审核</el-tag>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-empty v-else-if="!recordsLoading" description="暂无申请记录"></el-empty>
     </el-card>
   </div>
 </template>
@@ -63,10 +91,29 @@ export default {
         wname: '',
         sse: ''
       },
-      loading: false
+      loading: false,
+      recordsLoading: false,
+      applyRecords: []
     };
   },
+  mounted() {
+    this.loadApplyRecords()
+  },
   methods: {
+    loadApplyRecords() {
+      this.recordsLoading = true
+      request.get('/api/teacherCourse/findApplyByTeacher', { params: { offset: 1, limit: 50 } })
+        .then(res => {
+          const rows = (res && (res.rows || res.content)) || []
+          this.applyRecords = Array.isArray(rows) ? rows : []
+        })
+        .catch(() => {
+          this.applyRecords = []
+        })
+        .finally(() => {
+          this.recordsLoading = false
+        })
+    },
     onSubmit() {
       if (!this.form.courseName || !this.form.wname) {
         this.$message.warning('请填写完整信息');
@@ -77,11 +124,13 @@ export default {
       // 模拟提交或真实提交
       request.post('/api/course/add', this.form)
         .then(res => {
-          if (res.data.status == 1) {
+          const payload = res && res.data ? res.data : res
+          if (payload && payload.status == 1) {
              this.$message.success('课程申请已提交');
              this.resetForm();
+             this.loadApplyRecords()
           } else {
-             this.$message.error(res.data.msg || '提交失败');
+             this.$message.error((payload && payload.msg) || '提交失败');
           }
         })
         .catch(err => {

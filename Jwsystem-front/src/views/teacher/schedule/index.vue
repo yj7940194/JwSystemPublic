@@ -29,11 +29,17 @@
         
         <el-table-column v-for="(day, index) in weekDays" :key="index" :label="day" align="center" min-width="120">
           <template slot-scope="scope">
-            <div v-if="scope.row[index]" class="course-cell">
-              <div class="course-name">{{ scope.row[index].courseName }}</div>
-              <div class="course-info">
-                {{ scope.row[index].classesName }}<br/>
-                <i class="el-icon-location"></i> {{ scope.row[index].classroom }}
+            <div v-if="cellList(scope.row[index]).length" class="course-cell">
+              <div
+                v-for="(course, cIndex) in cellList(scope.row[index])"
+                :key="cIndex"
+                class="course-item"
+              >
+                <div class="course-name">{{ course.courseName }}</div>
+                <div class="course-info">
+                  <i class="el-icon-s-custom"></i> {{ course.teacherName }}<br/>
+                  <i class="el-icon-location"></i> {{ course.classroom }}
+                </div>
               </div>
             </div>
             <div v-else class="empty-cell"></div>
@@ -67,6 +73,11 @@ export default {
     this.getSchedule();
   },
   methods: {
+    cellList(cell) {
+      if (!cell) return []
+      if (Array.isArray(cell)) return cell.filter(Boolean)
+      return [cell]
+    },
     getSchedule() {
       this.loading = true;
       // 复用学生课表的数据处理逻辑，后端返回结构一致
@@ -113,6 +124,11 @@ export default {
   padding: 8px;
   border-left: 4px solid #67C23A;
   text-align: left;
+}
+.course-item + .course-item {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(103, 194, 58, 0.35);
 }
 .course-name {
   font-weight: bold;

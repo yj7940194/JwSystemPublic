@@ -5,23 +5,21 @@
         <span>教学方案详情</span>
       </div>
       
-      <div v-if="program">
+      <el-empty v-if="!program" description="未找到当前专业的教学方案"></el-empty>
+
+      <div v-else>
         <el-descriptions title="基本信息" :column="2" border>
-          <el-descriptions-item label="方案名称">{{ program.name }}</el-descriptions-item>
+          <el-descriptions-item label="方案ID">{{ program.id }}</el-descriptions-item>
           <el-descriptions-item label="专业代码">{{ program.specialtyId }}</el-descriptions-item>
-          <el-descriptions-item label="培养目标" :span="2">{{ program.target || '暂无描述' }}</el-descriptions-item>
-          <el-descriptions-item label="修读要求" :span="2">{{ program.require || '暂无描述' }}</el-descriptions-item>
+          <el-descriptions-item label="学年">{{ program.yearId || '-' }}</el-descriptions-item>
+          <el-descriptions-item label="状态">{{ Number(program.status) === 1 ? '启用' : '停用' }}</el-descriptions-item>
         </el-descriptions>
-        
-        <el-divider content-position="left">课程设置</el-divider>
-        
-        <el-empty v-if="!program.courses" description="暂无课程信息"></el-empty>
-        
-        <!-- 这里假设program对象里没有直接带课程列表，通常需要额外查询 -->
-        <el-alert title="课程列表需根据方案ID进一步查询" type="info" :closable="false" show-icon style="margin-top:20px"/>
+
+        <el-divider content-position="left">方案内容</el-divider>
+
+        <div v-if="program.htmlName" class="program-html" v-html="program.htmlName"></div>
+        <div v-else class="program-text">{{ program.name }}</div>
       </div>
-      
-      <el-empty v-else description="未找到当前专业的教学方案"></el-empty>
     </el-card>
   </div>
 </template>
@@ -44,7 +42,8 @@ export default {
       this.loading = true;
       request.get('/api/program/findProgram')
         .then(res => {
-          this.program = res.data;
+          const payload = res && res.data ? res.data : res
+          this.program = payload || null
         })
         .catch(err => {
           console.error(err);
@@ -61,5 +60,13 @@ export default {
 <style scoped>
 .app-container {
   padding: 20px;
+}
+.program-text {
+  white-space: pre-wrap;
+  line-height: 1.8;
+  color: #303133;
+}
+.program-html :deep(p) {
+  margin: 0 0 10px;
 }
 </style>

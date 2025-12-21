@@ -1,5 +1,6 @@
 package com.zxw.jwxt.service;
 
+import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -73,6 +74,9 @@ public class CollegeService extends BaseService {
 
     public RS save(TCollege model) {
         int count;
+        if (StringUtils.isBlank(model.getId())) {
+            model.setId(IdUtil.fastSimpleUUID());
+        }
         TCollege tCollege = collegeMapper.selectById(model.getId());
         if (tCollege != null) {
             count = collegeMapper.updateById(model);

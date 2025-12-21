@@ -1,5 +1,6 @@
 package com.zxw.jwxt.service;
 
+import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zxw.common.pojo.RS;
@@ -43,6 +44,9 @@ public class SpecialtyService extends BaseService {
     }
 
     public RS add(TSpecialty model) {
+        if (StringUtils.isBlank(model.getId())) {
+            model.setId(IdUtil.fastSimpleUUID());
+        }
         return specialtyMapper.insert(model) == 0 ? RS.error("插入失败") : RS.ok("插入成功");
     }
 
@@ -89,7 +93,7 @@ public class SpecialtyService extends BaseService {
         if (StringUtils.isNotEmpty(realm.getCollegeId())) {
             iPage = specialtyMapper.findByJwUser(page, getWrapper(baseQueryParam, keyword, map));
         } else {
-            iPage = specialtyMapper.findAll(page);
+            iPage = specialtyMapper.findAll(page, getWrapper(baseQueryParam, keyword, map));
         }
         return iPage;
     }
@@ -105,6 +109,9 @@ public class SpecialtyService extends BaseService {
 
     public RS saveOrUpdateSpeciatly(TSpecialty specialty) {
         int count;
+        if (StringUtils.isBlank(specialty.getId())) {
+            specialty.setId(IdUtil.fastSimpleUUID());
+        }
         TSpecialty tSpecialty = specialtyMapper.selectById(specialty.getId());
         if (tSpecialty != null) {
             count = specialtyMapper.updateById(specialty);

@@ -17,7 +17,11 @@ module.exports = {
   lintOnSave: process.env.NODE_ENV === 'development',
   productionSourceMap: false,
   devServer: {
+    host: process.env.HOST || '0.0.0.0',
     port: port,
+    // When running inside Docker, the dev server must listen on 0.0.0.0 but
+    // should announce a host reachable by the browser on the host machine.
+    public: process.env.DEV_SERVER_PUBLIC,
     open: false,
     overlay: {
       warnings: false,
@@ -25,18 +29,22 @@ module.exports = {
     },
     proxy: {
       '/api': {
-        target: process.env.VUE_APP_BASE_API,
+        target: process.env.VUE_APP_PROXY_TARGET || process.env.VUE_APP_BASE_API,
         changeOrigin: true,
         pathRewrite: {
           '^/api': 'api'
         }
       },
       '/auth': {
-        target: process.env.VUE_APP_BASE_API,
+        target: process.env.VUE_APP_PROXY_TARGET || process.env.VUE_APP_BASE_API,
         changeOrigin: true,
         pathRewrite: {
           '^/auth': 'auth'
         }
+      },
+      '/kaptcha': {
+        target: process.env.VUE_APP_PROXY_TARGET || process.env.VUE_APP_BASE_API,
+        changeOrigin: true
       }
     }
   },

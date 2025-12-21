@@ -1,262 +1,203 @@
 <template>
-  <el-row>
-    <el-col :span="14">
-      <!--row1-->
-      <el-row :gutter="20">
-        <el-col :span="8">
-          <el-card align="center" style="height: 185px">
-            <img src="../../../assets/images/avatar.png"/>
-            <div style="padding: 14px;">
-              <span>{{user.student.username}}</span>
+  <div class="student-dashboard">
+    <div v-if="user" class="content">
+      <el-row :gutter="16">
+        <el-col :xs="24" :md="8">
+          <el-card shadow="never" class="card">
+            <div class="profile">
+              <img class="avatar" src="../../../assets/images/avatar-default.svg" alt="avatar"/>
+              <div class="name">{{ (user.student && user.student.username) || '学生' }}</div>
+              <div class="meta">
+                <el-tag size="mini" effect="plain" type="info">{{ user.student && user.student.sex }}</el-tag>
+                <el-tag size="mini" effect="plain">{{ user.specialty && user.specialty.name }}</el-tag>
+              </div>
             </div>
           </el-card>
+
+          <el-card shadow="never" class="card mt-2">
+            <div slot="header" class="card-header">
+              <span>学习概览</span>
+            </div>
+            <div class="metrics">
+              <div class="metric">
+                <div class="metric-value">{{ user.courseNum }}</div>
+                <div class="metric-label">课程数</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value">{{ user.totalTime }}</div>
+                <div class="metric-label">总学时</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value">{{ user.upCourseRate }}%</div>
+                <div class="metric-label">到课率</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value">{{ user.eligiableRate }}%</div>
+                <div class="metric-label">合格率</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value">{{ user.disciplinary }}</div>
+                <div class="metric-label">违纪</div>
+              </div>
+            </div>
+          </el-card>
+
+          <el-card shadow="never" class="card mt-2">
+            <div slot="header" class="card-header">
+              <span>考勤统计</span>
+            </div>
+            <kao-qin :data="user.absentCount"/>
+          </el-card>
         </el-col>
-        <el-col :span="8">
-          <el-row :gutter="20">
-            <el-col :span="12">
-              <el-card class="top-card-middle">
-                <div style="position: absolute;right: 2px;top: 2px;font-size: 14px;font-weight: bold">
-                  <i style="font-size: 1.5em;" class="el-icon-user"></i>
-                </div>
-                <div align="center" class="top-card-content">
-                  <span>{{user.student.sex}}</span>
-                </div>
-                <div style="position: absolute;left: 2px;bottom: 2px;font-size: 14px;">
-                  性别
-                </div>
+
+        <el-col :xs="24" :md="16">
+          <el-row :gutter="16">
+            <el-col :xs="24" :md="12">
+              <el-card shadow="never" class="card chart-card">
+                <zhnl/>
               </el-card>
             </el-col>
-            <el-col :span="12">
-              <el-card class="top-card-middle">
-                <div style="position: absolute;right: 2px;top: 2px;font-size: 14px;font-weight: bold">
-                  <i style="font-size: 1.5em;" class="el-icon-notebook-2"></i>
-                </div>
-                <div align="center" class="top-card-content">
-                  <span>{{user.specialty.name}}</span>
-                </div>
-                <div style="position: absolute;left: 2px;bottom: 2px;font-size: 14px;">
-                  专业名称
-                </div>
+            <el-col :xs="24" :md="12">
+              <el-card shadow="never" class="card chart-card">
+                <zong-he/>
               </el-card>
             </el-col>
           </el-row>
-          <el-row :gutter="20" style="margin-top: 10px">
-            <el-col :span="12">
-              <el-card class="top-card-middle-1">
-                <div style="position: absolute;right: 2px;top: 2px;font-size: 14px;font-weight: bold">
-                  <i style="font-size: 1.5em;" class="el-icon-user"></i>
-                </div>
-                <div align="center" class="top-card-content">
-                  <span>汉</span>
-                </div>
-                <div style="position: absolute;left: 2px;bottom: 2px;font-size: 14px;">
-                  民族
-                </div>
-              </el-card>
-            </el-col>
-            <el-col :span="12">
-              <el-card class="top-card-middle-1">
-                <div style="position: absolute;right: 2px;top: 2px;font-size: 14px;font-weight: bold">
-                  <i style="font-size: 1.5em;" class="el-icon-school"></i>
-                </div>
-                <div align="center" class="top-card-content">
-                  <span>本科</span>
-                </div>
-                <div style="position: absolute;left: 2px;bottom: 2px;font-size: 14px;">
-                  学历层次
-                </div>
+
+          <el-row :gutter="16" class="mt-2">
+            <el-col :span="24">
+              <el-card shadow="never" class="card">
+                <cheng-ji
+                  :tongshi="user.tongshiRate"
+                  :shijian="user.shijanRate"
+                  :xueke="user.xuekeRate"
+                  :zhuanye="user.zhuanyeRate"
+                  :gonggong="user.gonggongRate"
+                />
               </el-card>
             </el-col>
           </el-row>
         </el-col>
-        <el-col :span="8">
-<!--          <van-circle  :rate="30" :speed="100" />-->
-          <zhnl></zhnl>
-        </el-col>
       </el-row>
-      <!--row2-->
-      <el-row :gutter="20" style="margin-top: 30px">
-        <el-row :gutter="10">
-          <el-col :span="5">
-            <el-card class="middle-card-middle">
-              <div align="center" class="middle-card-content">
-                <span>{{user.courseNum}}</span>
-              </div>
-              <div align="center" style="color: #1f2d3d;font-size: 12px">
-                课程数
-              </div>
-            </el-card>
-          </el-col>
-          <el-col :span="5">
-            <el-card class="middle-card-middle">
-              <div align="center" class="middle-card-content">
-                <span>{{user.totalTime}}</span>
-              </div>
-              <div align="center" style="color: #1f2d3d;font-size: 12px">
-                总学时
-              </div>
-            </el-card>
-          </el-col>
-          <el-col :span="5">
-            <el-card class="middle-card-middle">
-              <div align="center" class="middle-card-content">
-                <span>{{user.upCourseRate}}%</span>
-              </div>
-              <div align="center" style="color: #1f2d3d;font-size: 12px">
-                到课率
-              </div>
-            </el-card>
-          </el-col>
-          <el-col :span="5">
-            <el-card class="middle-card-middle">
-              <div align="center" class="middle-card-content">
-                <span>{{user.eligiableRate}}%</span>
-              </div>
-              <div align="center" style="color: #1f2d3d;font-size: 12px">
-                合格率
-              </div>
-            </el-card>
-          </el-col>
-          <el-col :span="4">
-            <el-card class="middle-card-middle">
-              <div align="center" class="middle-card-content">
-                <span>600</span>
-              </div>
-              <div align="center" style="color: #1f2d3d;font-size: 12px">
-                奖学金
-              </div>
-            </el-card>
-          </el-col>
-        </el-row>
-        <el-row :gutter="10" style="margin-top: 10px">
-          <el-col :span="5">
-            <el-card class="middle-card-middle">
-              <div align="center" class="middle-card-content">
-                <span>14215</span>
-              </div>
-              <div align="center" style="color: #1f2d3d;font-size: 12px">
-                上网时间
-              </div>
-            </el-card>
-          </el-col>
-          <el-col :span="5">
-            <el-card class="middle-card-middle">
-              <div align="center" class="middle-card-content">
-                <span>0</span>
-              </div>
-              <div align="center" style="color: #1f2d3d;font-size: 12px">
-                缴费及欠费
-              </div>
-            </el-card>
-          </el-col>
-          <el-col :span="5">
-            <el-card class="middle-card-middle">
-              <div align="center" class="middle-card-content">
-                <span>{{user.disciplinary}}</span>
-              </div>
-              <div align="center" style="color: #1f2d3d;font-size: 12px">
-                违纪
-              </div>
-            </el-card>
-          </el-col>
-          <el-col :span="5">
-            <el-card class="middle-card-middle">
-              <div align="center" class="middle-card-content">
-                <span>99</span>
-              </div>
-              <div align="center" style="color: #1f2d3d;font-size: 12px">
-                心理卫生
-              </div>
-            </el-card>
-          </el-col>
-          <el-col :span="4">
-            <el-card class="middle-card-middle">
-              <div align="center" class="middle-card-content">
-                <span>10</span>
-              </div>
-              <div align="center" style="color: #1f2d3d;font-size: 12px">
-                校园卡余额
-              </div>
-            </el-card>
-          </el-col>
-        </el-row>
-        <el-row :gutter="10" style="margin-top: 10px">
-          <kao-qin :data="user.absentCount"></kao-qin>
-        </el-row>
-      </el-row>
-    </el-col>
-    <el-col :span="10" align="center">
-      <zong-he></zong-he>
-      <div>
-        <cheng-ji :tongshi="user.tongshiRate" :shijian="user.shijanRate" :xueke="user.xuekeRate"
-                  :zhuanye="user.zhuanyeRate" :gonggong="user.gonggongRate"></cheng-ji>
-      </div>
-    </el-col>
-  </el-row>
+    </div>
+
+    <div v-else class="loading">
+      <el-skeleton :rows="6" animated/>
+    </div>
+  </div>
 </template>
 
 <script>
-  import zhnl from './zhnl'
-  import KaoQin from './KaoQin'
-  import ChengJi from './ChengJi'
-  import ZongHe from './ZongHe'
-  import count from '@/api/count/count'
+import zhnl from './zhnl'
+import KaoQin from './KaoQin'
+import ChengJi from './ChengJi'
+import ZongHe from './ZongHe'
+import count from '@/api/count/count'
 
-  export default {
-    components: {
-      zhnl,
-      KaoQin,
-      ChengJi,
-      ZongHe
-    },
-    data() {
-      return {
-        user: null
-      }
-    },
-    created() {
-      count.findStudentPanel().then(res => {
-        this.user = res;
-      })
-    },
-    mounted() {
+export default {
+  components: {
+    zhnl,
+    KaoQin,
+    ChengJi,
+    ZongHe
+  },
+  data() {
+    return {
+      user: null
     }
+  },
+  created() {
+    count.findStudentPanel().then(res => {
+      this.user = res
+    })
   }
+}
 </script>
 
-<style rel="stylesheet/scss" lang="scss" scoped>
-  .top-card-middle {
-    position: relative;
-    color: #77CDD6;
-  }
+<style lang="scss" scoped>
+.student-dashboard {
+  width: 100%;
+}
 
-  .top-card-middle-1 {
-    position: relative;
-    color: #E3AEA1
-  }
+.loading {
+  padding: 16px;
+}
 
-  .middle-card-middle {
-    position: relative;
-    color: #60ABD9;
-  }
+.card {
+  border-radius: 10px;
+}
 
-  .top-card-content {
-    padding: 15px 5px;
-    font-size: 12px;
-    font-weight: bold;
-  }
+.mt-2 {
+  margin-top: 16px;
+}
 
-  .middle-card-content {
-    padding: 15px 5px;
-    font-size: 24px;
-    font-weight: bold;
+.profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0 4px;
+}
+
+.avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+}
+
+.name {
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #303133;
+}
+
+.meta {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric {
+  padding: 10px 12px;
+  border: 1px solid rgba(144, 147, 153, 0.15);
+  border-radius: 10px;
+  background: #fafcff;
+}
+
+.metric-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 24px;
+}
+
+.metric-label {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #606266;
+}
+
+.chart-card {
+  min-height: 260px;
+}
+
+@media (max-width: 992px) {
+  .metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-  section{width:2rem;height:2rem;position: relative;margin:2rem;}
-  .wrap,.circle,.percent{position: absolute; width: 2rem; height: 2rem; border-radius: 50%;}
-  .wrap{top:0; left:0; background-color:#ccc;}
-  .circle{box-sizing: border-box; -webkit-box-sizing:border-box; -ms-box-sizing:border-box; -moz-box-sizing:border-box; -o-box-sizing:border-box; border:1px solid #ccc; clip:rect(0,2rem,2rem,1rem);}
-  .clip-auto{clip:rect(auto, auto, auto, auto);} .percent{box-sizing: border-box; -webkit-box-sizing:border-box; -ms-box-sizing:border-box; -moz-box-sizing:border-box; -o-box-sizing:border-box; top:-1px; left:-1px;}
-  .left{border:0.1rem solid #ff6300; clip: rect(0,1rem,2rem,0);} .right{border:0.1rem solid #FF6300; clip: rect(0,2rem,2rem,1rem);}
-  .wth0{width:0;}
-  .num{position: absolute; box-sizing: border-box; -webkit-box-sizing:border-box; -ms-box-sizing:border-box; -moz-box-sizing:border-box; -o-box-sizing:border-box; width:1.8rem; height:1.8rem; line-height:1.8rem; text-align: center; font-size: 0.5rem; left:0.1rem; top:0.1rem; border-radius: 50%; color:#FF6300; background: white; z-index: 1;}
+}
+
+@media (max-width: 768px) {
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 </style>

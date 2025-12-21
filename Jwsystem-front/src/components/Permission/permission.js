@@ -4,7 +4,10 @@ export default {
   inserted(el, binding, vnode) {
     const { value } = binding
     const roles = store.getters && store.getters.roles
-    if (value && value instanceof Array && value.length > 0) {
+    if (!value) {
+      return
+    }
+    if (value instanceof Array && value.length > 0) {
       const permissionRoles = value
 
       const hasPermission = roles.some(role => {
@@ -15,7 +18,10 @@ export default {
         el.parentNode && el.parentNode.removeChild(el)
       }
     } else {
-      throw new Error(`使用方式： v-permission="['admin','editor']"`)
+      // Ignore invalid usage to avoid crashing the whole render tree.
+      // Correct usage: v-permission="['admin','editor']"
+      // eslint-disable-next-line no-console
+      console.warn(`v-permission expects an array, got:`, value)
     }
   }
 }

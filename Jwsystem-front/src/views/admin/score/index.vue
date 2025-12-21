@@ -100,7 +100,7 @@
 import echarts from 'echarts'
 require('echarts/theme/macarons')
 import { debounce } from '@/utils'
-import { listajax as listCourses } from '@/api/admin/course'
+import request from '@/utils/request'
 import { countCourseScore } from '@/api/common/count'
 
 export default {
@@ -170,17 +170,21 @@ export default {
     async fetchCourses() {
       this.coursesLoading = true
       try {
-        const res = await listCourses()
-        const list =
-          Array.isArray(res) ? res : res && Array.isArray(res.content) ? res.content : res && Array.isArray(res.data) ? res.data : []
-        this.courses = (list || [])
+        // 成绩统计使用 teacher_course.id（开课记录）作为 cid
+        const res = await request.get('api/course/pageQuery', { params: { offset: 1, limit: 9999 } })
+        const rows = (res && res.rows) || []
+        const list = Array.isArray(rows) ? rows : []
+        this.courses = list
           .map((c) => ({
-            id: c && (c.id || c.courseId || c.cid),
-            name: c && (c.name || c.courseName || c.cname || c.title)
+            id: c && c.id,
+            name: c && (c.name || c.courseName || c.cname),
+            people: Number(c && c.people) || 0
           }))
           .filter((c) => c && c.id && c.name)
+          .sort((a, b) => (b.people || 0) - (a.people || 0))
         if (!this.selectedCourseId && this.courses.length) {
-          this.selectedCourseId = this.courses[0].id
+          const preferred = this.courses.find((c) => (c.people || 0) > 0) || this.courses[0]
+          this.selectedCourseId = preferred.id
         }
       } catch (e) {
         this.courses = []

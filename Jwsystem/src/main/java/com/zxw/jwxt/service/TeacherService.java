@@ -84,7 +84,8 @@ public class TeacherService extends BaseService {
         }
         List<CourseDTO> list = courseService.findScheduleByTeacher(userId, teamId);
         list.forEach(e -> {
-            ScheduleDTO scheduleDTO = new ScheduleDTO(e.getName(), e.getWname(), e.getNname(), e.getClassroom(), null);
+            // teacher 课表：展示“课程 + 教学班(团队) + 教室”，因此这里用 tname 作为辅助信息
+            ScheduleDTO scheduleDTO = new ScheduleDTO(e.getName(), e.getWname(), e.getTname(), e.getClassroom(), null);
             switch (e.getSse()) {
                 case "1-2节":
                     parseSchedule(arr, e, scheduleDTO, 0);

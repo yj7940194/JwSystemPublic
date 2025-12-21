@@ -9,19 +9,22 @@ export function add(data) {
 }
 
 export function del(ids) {
-  return request({
-    url: 'api/classes/delete',
-    method: 'get',
-    params: { ids }
-  })
+  const idList = Array.isArray(ids) ? ids : [ids]
+  return Promise.all(
+    idList.map(id => request({
+      url: 'api/classes/delete',
+      method: 'delete',
+      params: { id }
+    }))
+  )
 }
 
 export function edit(data) {
-  // Backend lacks edit endpoint, maybe 'add' handles it?
-  // But safest is to return error or empty.
-  // We can just not export it or make it fail.
-  // Or maybe use add?
-  return Promise.reject('Update not supported by backend')
+  return request({
+    url: 'api/classes/update',
+    method: 'post',
+    data
+  })
 }
 
 export default { add, del, edit }

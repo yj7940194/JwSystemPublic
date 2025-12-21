@@ -86,12 +86,26 @@ export const logOut = (commit) => {
 }
 
 export const setUserInfo = (res, commit) => {
-  // 如果没有任何权限，则赋予一个默认的权限，避免请求死循环
-  if (res.roles.length === 0) {
-    commit('SET_ROLES', ['ROLE_SYSTEM_DEFAULT'])
-  } else {
-    commit('SET_ROLES', res.roles)
+  const roles = Array.isArray(res && res.roles) ? res.roles.filter(Boolean) : []
+  if (roles.length === 0) {
+    const qx = res && res.qx
+    if (qx) {
+      roles.push(qx)
+      // Backward compatibility: many views still use eladmin-style role keys.
+      if (qx === '管理员' || qx === '教务人员') {
+        roles.push('admin')
+      } else if (qx === '教师' || qx === '讲师' || qx === '院长') {
+        roles.push('teacher')
+      } else if (qx === '学生') {
+        roles.push('student')
+      }
+    }
   }
+  // 如果没有任何权限，则赋予一个默认的权限，避免请求死循环
+  if (roles.length === 0) {
+    roles.push('ROLE_SYSTEM_DEFAULT')
+  }
+  commit('SET_ROLES', roles)
   commit('SET_USER', res)
 }
 

@@ -54,6 +54,11 @@ public class TClassesController extends BaseController {
         return classesService.save(classes);
     }
 
+    @PostMapping("/update")
+    public RS update(@RequestBody TClasses classes) {
+        return classesService.update(classes);
+    }
+
     /**
      * 删除班级
      *
@@ -63,6 +68,11 @@ public class TClassesController extends BaseController {
     @GetMapping("/delete")
     public RS delete(QueryClassesVO classesVO) {
         return classesService.deleteBatch(classesVO);
+    }
+
+    @DeleteMapping("/delete")
+    public RS deleteById(@RequestParam("id") String id) {
+        return classesService.deleteById(id);
     }
 
     @GetMapping("/findById")

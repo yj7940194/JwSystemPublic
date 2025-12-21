@@ -1,0 +1,58 @@
+services:
+  dev:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    user: root
+    volumes:
+      - ..:/workspace:cached
+      - dev_m2:/home/ubuntu/.m2
+      - dev_frontend_node_modules:/workspace/Jwsystem-front/node_modules
+      - dev_root_node_modules:/workspace/node_modules
+    environment:
+      TZ: Asia/Shanghai
+      JW_DB_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE:-jw_springboot}?characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      JW_DB_USER: ${MYSQL_USER:-jw_user}
+      JW_DB_PASSWORD: ${MYSQL_PASSWORD:-jw_password}
+      JW_CAPTCHA_BYPASS: ${JW_CAPTCHA_BYPASS:-false}
+      # Make dev servers reachable from the host through port forwarding
+      HOST: 0.0.0.0
+      PORT: 8081
+      DEV_SERVER_PUBLIC: localhost:8081
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      bash -lc
+      "mkdir -p /home/ubuntu/.m2 /workspace/Jwsystem-front/node_modules /workspace/node_modules;
+      chown -R ubuntu:ubuntu /home/ubuntu/.m2 /workspace/Jwsystem-front/node_modules /workspace/node_modules;
+      exec sleep infinity"
+
+  db:
+    image: mysql:8.0.33
+    restart: unless-stopped
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-jw_springboot}
+      MYSQL_USER: ${MYSQL_USER:-jw_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-jw_password}
+    volumes:
+      - dev_db_data:/var/lib/mysql
+      - ../Jwsystem/115jw-springboot.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+      - ../scripts/seed_demo_data.sql:/docker-entrypoint-initdb.d/02_seed_demo_data.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  dev_db_data:
+  dev_m2:
+  dev_frontend_node_modules:
+  dev_root_node_modules:

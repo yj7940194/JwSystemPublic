@@ -4,18 +4,24 @@ set -euo pipefail
 repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 node_version="${NODE_VERSION:-14.21.3}"
 
-if [[ ! -s "$HOME/.nvm/nvm.sh" ]]; then
-  echo "nvm not found at $HOME/.nvm/nvm.sh" >&2
-  exit 1
+use_nvm=false
+if [[ -s "$HOME/.nvm/nvm.sh" ]]; then
+  # shellcheck disable=SC1090
+  source "$HOME/.nvm/nvm.sh"
+  if nvm ls "$node_version" | grep -q "$node_version"; then
+    use_nvm=true
+  else
+    echo "Node $node_version is not installed in nvm. Falling back to system node (if available)." >&2
+  fi
 fi
 
-# shellcheck disable=SC1090
-source "$HOME/.nvm/nvm.sh"
-
-if ! nvm ls "$node_version" | grep -q "$node_version"; then
-  echo "Node $node_version is not installed. Install it first:" >&2
-  echo "  nvm install $node_version" >&2
-  exit 1
+if ! $use_nvm; then
+  if ! command -v node >/dev/null 2>&1; then
+    echo "Neither nvm($node_version) nor system node found. Install one of them:" >&2
+    echo "  - nvm install $node_version" >&2
+    echo "  - or install Node.js >=14" >&2
+    exit 1
+  fi
 fi
 
 cd "$repo_dir/Jwsystem-front"
@@ -32,7 +38,15 @@ echo "HOST: $HOST"
 echo "PORT: $PORT"
 
 if [[ ! -d node_modules ]]; then
-  nvm exec "$node_version" npm install
+  if $use_nvm; then
+    nvm exec "$node_version" npm install
+  else
+    npm install
+  fi
 fi
 
-nvm exec "$node_version" npm run dev -- --host "$HOST" --port "$PORT"
+if $use_nvm; then
+  nvm exec "$node_version" npm run dev -- --host "$HOST" --port "$PORT"
+else
+  npm run dev -- --host "$HOST" --port "$PORT"
+fi

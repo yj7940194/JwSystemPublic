@@ -15,6 +15,7 @@
     props: {
       courseData: {
         type: Array,
+        default: () => []
       },
       className: {
         type: String,
@@ -36,6 +37,17 @@
         total: null,
         falseNum: null,
         data: []
+      }
+    },
+    watch: {
+      courseData: {
+        deep: true,
+        handler(val) {
+          if (!this.chart) return
+          this.chart.setOption({
+            series: [{ data: val || [] }]
+          })
+        }
       }
     },
     mounted() {

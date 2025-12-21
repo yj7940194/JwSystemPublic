@@ -8,6 +8,7 @@ public class RS extends HashMap<String, Object> {
     public RS() {
         put("code", 0);
         put("msg", "success");
+        put("status", "1");
     }
 
     public static RS error() {
@@ -20,6 +21,7 @@ public class RS extends HashMap<String, Object> {
 
     public static RS error(int code, String msg) {
         RS r = new RS();
+        r.put("status", "0");
         r.put("code", code);
         r.put("msg", msg);
         return r;

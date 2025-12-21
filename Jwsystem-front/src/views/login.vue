@@ -64,8 +64,10 @@
   export default {
     name: 'Login',
     data() {
+      const apiBase = process.env.NODE_ENV === 'development' ? '' : (process.env.VUE_APP_BASE_API || '')
       return {
-        codeUrl: 'http://localhost:8080/kaptcha/create',
+        apiBase,
+        codeUrl: `${apiBase}/kaptcha/create`,
         cookiePass: '',
         loginForm: {
           username: '1',
@@ -92,7 +94,7 @@
     },
     methods: {
       getCode() {
-        this.codeUrl = 'http://localhost:8080/kaptcha/create?timestamp=' + new Date().getTime()
+        this.codeUrl = `${this.apiBase}/kaptcha/create?timestamp=${Date.now()}`
       },
       handleLogin() {
         this.$refs.loginForm.validate(valid => {
@@ -108,11 +110,11 @@
               this.loading = false
               this.$router.push({ path: '/' })
             }).catch(() => {
-              this.codeUrl = 'http://localhost:8080/kaptcha/create?timestamp=' + new Date().getTime()
+              this.codeUrl = `${this.apiBase}/kaptcha/create?timestamp=${Date.now()}`
               this.loading = false
             })
           } else {
-            this.codeUrl = 'http://localhost:8080/kaptcha/create?timestamp=' + new Date().getTime()
+            this.codeUrl = `${this.apiBase}/kaptcha/create?timestamp=${Date.now()}`
             console.log('error submit!!')
             return false
           }
