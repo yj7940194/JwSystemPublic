@@ -75,8 +75,13 @@ elif [[ "$(cat "$stamp_file" 2>/dev/null || true)" != "$fingerprint" ]]; then
 fi
 
 if $need_install; then
-  echo "Installing frontend deps (npm ci)..." >&2
-  npm ci --no-audit --no-fund
+  install_cmd=(npm ci --no-audit --no-fund)
+  if [[ ! -f package-lock.json ]]; then
+    install_cmd=(npm install --no-audit --no-fund --no-package-lock)
+  fi
+
+  echo "Installing frontend deps (${install_cmd[*]})..." >&2
+  "${install_cmd[@]}"
   mkdir -p node_modules
   echo "$fingerprint" > "$stamp_file"
 else
@@ -90,4 +95,3 @@ fi
 host="${HOST:-0.0.0.0}"
 port="${PORT:-8081}"
 exec npm run dev -- --host "$host" --port "$port"
-
