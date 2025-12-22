@@ -3,6 +3,7 @@ HELP.md
 /Jwsystem-front/node_modules/
 /src/main/resources/front/front/node_modules/
 
+.env
 .env.local
 /Jwsystem/images/
 

@@ -50,7 +50,7 @@
 
 ## 三、环境介绍
 
-基础环境 :IDEA/eclipse, JDK1.8, Mysql5.7及以上,Maven3.6, node14
+基础环境 :IDEA/eclipse, JDK1.8, Mysql5.7及以上,Maven3.6, node16（推荐）+ npm9（前端 `package-lock.json` 为 lockfileVersion=3）
 
 所有项目以及源代码本人均调试运行无问题 可支持远程调试运行
 
@@ -111,9 +111,9 @@
 - 管理员账号/密码：1/123456
 
 ## 六、部署教程
+如果只需要一键运行（推荐交接/演示），直接按 `DOCKER.md` 用 Docker Compose 启动即可。
 1. 使用Navicat或者其它工具，在mysql中创建对应名称的数据库，并执行项目的sql文件；
 2. 使用IDEA/Eclipse导入Jwsystem项目，若为maven项目请选择maven，等待依赖下载完成；
 3. 修改application.yml里面的数据库配置和文件路径配置，启动后端项目
 4. vscode或idea打开Jwsystem-front项目，
-5. 在编译器中打开terminal，执行npm install 依赖下载完成后执行 npm run dev,执行成功后会显示访问地址
-
+5. 在编译器中打开terminal，执行 `npm ci`（推荐）依赖下载完成后执行 `npm run dev`，执行成功后会显示访问地址（如遇前端启动失败/网页打不开，优先核对 Node 版本，必要时删除 `node_modules` 后重新 `npm ci`）

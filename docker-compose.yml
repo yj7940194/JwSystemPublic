@@ -35,11 +35,17 @@ services:
       JW_DB_PASSWORD: ${MYSQL_PASSWORD:-jw_password}
       JW_CAPTCHA_BYPASS: ${JW_CAPTCHA_BYPASS:-false}
     ports:
-      - "8080:8080"
+      - "${BACKEND_PORT:-8080}:8080"
     volumes:
       - ./Jwsystem:/workspace/Jwsystem:cached
       - m2:/root/.m2
     command: mvn -DskipTests spring-boot:run
+    healthcheck:
+      test: ["CMD-SHELL", "bash -lc 'cat < /dev/null > /dev/tcp/127.0.0.1/8080'"]
+      interval: 5s
+      timeout: 3s
+      start_period: 10m
+      retries: 30
 
   frontend:
     build:
@@ -47,26 +53,29 @@ services:
       dockerfile: Dockerfile.frontend
     working_dir: /workspace/Jwsystem-front
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     environment:
       # Browser-side base API (reachable from host). DevServer proxy uses VUE_APP_PROXY_TARGET.
-      VUE_APP_BASE_API: http://127.0.0.1:8080
-      VUE_APP_PROXY_TARGET: http://backend:8080
+      VUE_APP_BASE_API: ${VUE_APP_BASE_API:-http://127.0.0.1:8080}
+      VUE_APP_PROXY_TARGET: ${VUE_APP_PROXY_TARGET:-http://backend:8080}
       # Fix HMR sockjs hostname when running inside Docker.
-      DEV_SERVER_PUBLIC: 127.0.0.1:8081
-      CHOKIDAR_USEPOLLING: "true"
-      HOST: 0.0.0.0
+      DEV_SERVER_PUBLIC: ${DEV_SERVER_PUBLIC:-127.0.0.1:8081}
+      CHOKIDAR_USEPOLLING: ${CHOKIDAR_USEPOLLING:-true}
+      HOST: ${FRONTEND_HOST:-0.0.0.0}
       PORT: 8081
     ports:
-      - "8081:8081"
+      - "${FRONTEND_PORT:-8081}:8081"
     volumes:
       - ./Jwsystem-front:/workspace/Jwsystem-front:cached
       - frontend_node_modules:/workspace/Jwsystem-front/node_modules
-    command: >
-      bash -lc
-      "if [ ! -d node_modules ] || [ -z \"$(ls -A node_modules 2>/dev/null)\" ];
-      then npm ci; fi;
-      npm run dev -- --host 0.0.0.0 --port 8081"
+    command: bash -lc "bash ./scripts/docker-dev.sh"
+    healthcheck:
+      test: ["CMD-SHELL", "node ./scripts/healthcheck-http.js http://127.0.0.1:8081/"]
+      interval: 5s
+      timeout: 3s
+      start_period: 10m
+      retries: 30
 
 volumes:
   jw_db_data:
