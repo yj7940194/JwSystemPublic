@@ -77,4 +77,3 @@ echo "Repo: $repo_dir"
 stop_by_pidfile "$frontend_pid_file" "run-frontend-dev.sh"
 stop_by_pidfile "$backend_pid_file" "run-backend-dev.sh"
 echo "OK"
-

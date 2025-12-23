@@ -2,3 +2,6 @@
 *.css linguist-language=java
 *.html linguist-language=java
 *.vue linguist-language=java
+
+# Ensure scripts run correctly in Linux containers/WSL.
+*.sh text eol=lf

@@ -81,4 +81,3 @@ wait_http "http://127.0.0.1:8081/" "Frontend" 120
 echo "OK"
 echo "Backend:  http://127.0.0.1:8080/"
 echo "Frontend: http://127.0.0.1:8081/"
-
