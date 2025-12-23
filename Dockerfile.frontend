@@ -1,4 +1,5 @@
-FROM node:16-bullseye
+ARG DOCKER_REGISTRY=docker.io
+FROM ${DOCKER_REGISTRY}/library/node:16-bullseye
 
 # Vue2 project uses lockfileVersion=3, which requires npm 9+.
 # Node 16 avoids OpenSSL 3 issues with webpack 4 (Vue CLI 3.x).
@@ -6,4 +7,3 @@ RUN npm install -g npm@9 \
   && npm -v
 
 WORKDIR /workspace/Jwsystem-front
-

@@ -112,6 +112,7 @@
 
 ## 六、部署教程
 如果只需要一键运行（推荐交接/演示），直接按 `DOCKER.md` 用 Docker Compose 启动即可。
+如果遇到 Docker Hub 网络不可达导致拉取镜像失败（如 `failed to fetch oauth token`），可按 `DOCKER.md` 的排查指引在 `.env` 里设置 `DOCKER_REGISTRY` 后重试。
 1. 使用Navicat或者其它工具，在mysql中创建对应名称的数据库，并执行项目的sql文件；
 2. 使用IDEA/Eclipse导入Jwsystem项目，若为maven项目请选择maven，等待依赖下载完成；
 3. 修改application.yml里面的数据库配置和文件路径配置，启动后端项目

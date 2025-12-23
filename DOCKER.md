@@ -24,7 +24,17 @@ cd JwSystemPublic
 
 `docker-compose.yml` 内所有关键参数都有默认值；如果你希望自定义（尤其是数据库密码），在仓库根目录新建一个 `.env`（不要提交到 Git）：
 
+你也可以直接复制模板（推荐）：
+
 ```bash
+cp .env.example .env
+```
+
+```bash
+# Docker 镜像源（默认 docker.io；如果你的网络无法访问 Docker Hub，可改成可用的镜像/代理域名）
+# 例如：DOCKER_REGISTRY=docker.m.daocloud.io
+DOCKER_REGISTRY=docker.io
+
 # MySQL（仅首次初始化卷时会写入）
 MYSQL_ROOT_PASSWORD=root
 MYSQL_DATABASE=jw_springboot
@@ -143,6 +153,13 @@ docker compose up -d --build
 
 ## 10. 常见问题排查
 
+- 构建时报 `failed to fetch oauth token` / `auth.docker.io` 连接失败：
+  - 这是 Docker Hub 网络不可达/被墙/IPv6 连接失败导致的镜像拉取失败（不是 Dockerfile 语法问题）。
+  - 方案 A（推荐）：在 Docker Engine/Docker Desktop 配置 `registry-mirrors`（镜像加速器）后重试。
+  - 方案 B（本项目已支持）：在仓库根目录 `.env` 里设置 `DOCKER_REGISTRY` 为你可用的镜像/代理域名，然后重试：
+    ```bash
+    DOCKER_REGISTRY=docker.m.daocloud.io docker compose up -d --build
+    ```
 - `8080/8081` 端口被占用：用环境变量改宿主端口映射（无需改文件）：
   ```bash
   FRONTEND_PORT=18081 BACKEND_PORT=18080 docker compose up -d --build
