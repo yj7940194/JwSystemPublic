@@ -75,13 +75,59 @@ elif [[ "$(cat "$stamp_file" 2>/dev/null || true)" != "$fingerprint" ]]; then
 fi
 
 if $need_install; then
-  install_cmd=(npm ci --no-audit --no-fund)
+  install_cmd=(npm ci --no-audit --no-fund --include=dev)
   if [[ ! -f package-lock.json ]]; then
-    install_cmd=(npm install --no-audit --no-fund --no-package-lock)
+    install_cmd=(npm install --no-audit --no-fund --no-package-lock --include=dev)
   fi
 
   echo "Installing frontend deps (${install_cmd[*]})..." >&2
-  "${install_cmd[@]}"
+
+  max_attempts=3
+  attempt=1
+  while (( attempt <= max_attempts )); do
+    tmp_log="$(mktemp)"
+    set +e
+    "${install_cmd[@]}" 2>&1 | tee "$tmp_log"
+    status="${PIPESTATUS[0]}"
+    set -e
+
+    if (( status == 0 )); then
+      rm -f "$tmp_log"
+      break
+    fi
+
+    if grep -Eq 'npm ERR! code (ENOTEMPTY|EBUSY)|ENOTEMPTY: directory not empty, rmdir|EBUSY: resource busy or locked' "$tmp_log"; then
+      if (( attempt >= max_attempts )); then
+        rm -f "$tmp_log"
+        exit "$status"
+      fi
+
+      echo "npm install failed with ENOTEMPTY/EBUSY; cleaning and retrying (${attempt}/${max_attempts})..." >&2
+
+      declare -A cleanup_paths=()
+      while IFS= read -r p; do
+        [[ -n "${p:-}" ]] || continue
+        cleanup_paths["$p"]=1
+      done < <(sed -n -E 's/^npm ERR! path (.+)$/\1/p' "$tmp_log")
+
+      while IFS= read -r p; do
+        [[ -n "${p:-}" ]] || continue
+        cleanup_paths["$p"]=1
+      done < <(sed -n -E "s/.*rmdir '([^']+)'.*/\\1/p" "$tmp_log")
+
+      for p in "${!cleanup_paths[@]}"; do
+        rm -rf "$p" 2>/dev/null || true
+      done
+
+      rm -f "$tmp_log"
+      sleep "$attempt"
+      attempt=$((attempt + 1))
+      continue
+    fi
+
+    rm -f "$tmp_log"
+    exit "$status"
+  done
   mkdir -p node_modules
   echo "$fingerprint" > "$stamp_file"
 else
