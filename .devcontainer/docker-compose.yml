@@ -9,6 +9,7 @@ services:
       - dev_m2:/home/ubuntu/.m2
       - dev_frontend_node_modules:/workspace/Jwsystem-front/node_modules
       - dev_root_node_modules:/workspace/node_modules
+      - dev_backend_target:/workspace/Jwsystem/target
     environment:
       TZ: Asia/Shanghai
       JW_DB_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE:-jw_springboot}?characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
@@ -24,8 +25,8 @@ services:
         condition: service_healthy
     command: >
       bash -lc
-      "mkdir -p /home/ubuntu/.m2 /workspace/Jwsystem-front/node_modules /workspace/node_modules;
-      chown -R ubuntu:ubuntu /home/ubuntu/.m2 /workspace/Jwsystem-front/node_modules /workspace/node_modules;
+      "mkdir -p /home/ubuntu/.m2 /workspace/Jwsystem-front/node_modules /workspace/node_modules /workspace/Jwsystem/target;
+      chown -R ubuntu:ubuntu /home/ubuntu/.m2 /workspace/Jwsystem-front/node_modules /workspace/node_modules /workspace/Jwsystem/target;
       exec sleep infinity"
 
   db:
@@ -56,3 +57,4 @@ volumes:
   dev_m2:
   dev_frontend_node_modules:
   dev_root_node_modules:
+  dev_backend_target:

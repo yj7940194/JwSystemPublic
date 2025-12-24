@@ -90,6 +90,7 @@ JW_CAPTCHA_BYPASS=true docker compose up -d --build
 
 - MySQL 数据：Docker volume `jw_db_data`（`docker compose down` 不会删除；`docker compose down -v` 才会删）
 - Maven 缓存：Docker volume `m2`
+- 后端构建输出：Docker volume `backend_target`（对应容器内 `/workspace/Jwsystem/target`）
 - 前端依赖：Docker volume `frontend_node_modules`
 - 上传/生成的图片文件：`Jwsystem/images`（绑定到宿主机目录；已在 `.gitignore` 忽略）
 

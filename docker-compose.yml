@@ -39,6 +39,7 @@ services:
     volumes:
       - ./Jwsystem:/workspace/Jwsystem:cached
       - m2:/root/.m2
+      - backend_target:/workspace/Jwsystem/target
     command: mvn -DskipTests spring-boot:run
     healthcheck:
       test: ["CMD-SHELL", "bash -lc 'cat < /dev/null > /dev/tcp/127.0.0.1/8080'"]
@@ -83,3 +84,4 @@ volumes:
   jw_db_data:
   m2:
   frontend_node_modules:
+  backend_target:
