@@ -1,19 +1,5 @@
-## 本项目完整源码是收费的  接毕业设计和论文
 
-### 作者QQ：931708230 微信：ynwwxid (支持修改、 部署调试、 支持代做毕设)
-
-### 接网站建设、小程序、H5、APP、各种系统等
-
-**博客地址：
-[https://blog.csdn.net/2303_76227485/article/details/135274762](https://blog.csdn.net/2303_76227485/article/details/135274762)**
-
-**视频演示：
-[https://www.bilibili.com/video/BV1cT4y1x79z/](https://www.bilibili.com/video/BV1cT4y1x79z/)**
-
-**毕业设计所有选题地址：
-[https://github.com/ynwynw/allProject](https://github.com/ynwynw/allProject)**
-
-## 基于Java+Springboot+Vue的教务管理系统(源代码+数据库+开题+ppt)115
+## 基于Java+Springboot+Vue的教务管理系统
 
 ## 一、系统介绍
 本项目前后端分离，本系统分为管理员、教务人员、教师、学生四种角色
